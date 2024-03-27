@@ -1,0 +1,10 @@
+{
+  "Lua.diagnostics.globals": [
+    "vim",
+    "after_each",
+    "assert",
+    "before_each",
+    "describe",
+    "it"
+  ]
+}
