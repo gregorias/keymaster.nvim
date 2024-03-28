@@ -2,20 +2,21 @@ local M = {}
 local registry = require("keymaster.registry")
 
 -- TODO: Document this function.
-M.setup = function()
-	local wk_status, wk = pcall(require, "which-key")
+M.setup = function(config)
+	config = config or {}
 
 	local main_observer = nil
-	if wk_status then
-		main_observer = require("keymaster.whichkey").WhichKeyObserver(wk)
+	if config.which_key ~= nil then
+		main_observer = require("keymaster.whichkey").WhichKeyObserver(config.which_key)
 	else
 		main_observer = require("keymaster.vim-keymap").VimKeymap()
 	end
 	registry:register_observer(main_observer)
 end
 
--- TODO: Add a comment.
+--- Set a keymap.
 M.set_keymap = function(mode, lhs, rhs, opts)
+	-- TODO: Handle nil in arguments.
 	registry:add_keymap({
 		lhs = lhs,
 		rhs = rhs,

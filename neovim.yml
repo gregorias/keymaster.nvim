@@ -12,6 +12,9 @@ globals:
       - type: bool
       - type: string
         required: false
+  assert.True:
+    args:
+      - type: bool
   before_each:
     args:
       - type: function
