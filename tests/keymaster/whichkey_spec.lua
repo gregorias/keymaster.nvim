@@ -14,7 +14,6 @@ describe("keymaster.whichkey", function()
 			})
 
 			-- TODO: Add a matcher that checks two lists for unordered equality.
-			-- TODO: Fix Selene classifying this as an error.
 			assert.are.same({
 				{
 					modes = "n",

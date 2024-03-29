@@ -12,6 +12,10 @@ globals:
       - type: bool
       - type: string
         required: false
+  assert.are.same:
+    args:
+      - type: any
+      - type: any
   assert.True:
     args:
       - type: bool
