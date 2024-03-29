@@ -14,8 +14,8 @@ M.setup = function(config)
 	registry:register_observer(main_observer)
 end
 
---- Set a keymap.
-M.set_keymap = function(mode, lhs, rhs, opts)
+--- Set a keymap using Neovim-like keymap syntax.
+local set_vim_keymap = function(mode, lhs, rhs, opts)
 	opts = opts or {}
 	registry:add_keymap({
 		lhs = lhs,
@@ -23,6 +23,26 @@ M.set_keymap = function(mode, lhs, rhs, opts)
 		modes = mode,
 		description = opts.description,
 	})
+end
+
+--- Set keymaps using Which-Key-like keymap syntax.
+local set_which_key_keymaps = function(mappings, opts)
+	opts = opts or {}
+	local which_key_mappings = require("keymaster.whichkey").from_wk_keymaps(mappings, opts)
+	for _, mapping in ipairs(which_key_mappings) do
+		registry:add_keymap(mapping)
+	end
+end
+
+--- Set a keymap.
+--
+-- Accepts both Neovim-like keymap syntax and Which-Key-like keymap syntax.
+M.set_keymap = function(mappings_or_modes, wk_opts_or_lhs, rhs, opts)
+	if type(mappings_or_modes) == "string" or vim.tbl_islist(mappings_or_modes) then
+		set_vim_keymap(mappings_or_modes, wk_opts_or_lhs, rhs, opts)
+	else
+		set_which_key_keymaps(mappings_or_modes, wk_opts_or_lhs)
+	end
 end
 
 --- Get all set keymaps.
