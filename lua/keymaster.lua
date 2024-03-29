@@ -16,13 +16,8 @@ end
 
 --- Set a keymap using Neovim-like keymap syntax.
 local set_vim_keymap = function(mode, lhs, rhs, opts)
-	opts = opts or {}
-	registry:add_keymap({
-		lhs = lhs,
-		rhs = rhs,
-		modes = mode,
-		description = opts.description,
-	})
+	local km_keymap = require("lua.keymaster.vim-keymap").from_vim_keymap(mode, lhs, rhs, opts)
+	registry:add_keymap(km_keymap)
 end
 
 --- Set keymaps using Which-Key-like keymap syntax.
