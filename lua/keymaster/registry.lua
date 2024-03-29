@@ -1,5 +1,7 @@
--- TODO: Consider a module level LDoc comment.
--- Registry is a singleton object that manages all the registered keymaps and groups.
+--- The Keymaster registry
+---
+--- Registry is a singleton object that manages all the registered keymaps and
+--- groups. It provides an observable pattern for keymap observers.
 local Registry = {
 	observers = {},
 	keymaps = {},
