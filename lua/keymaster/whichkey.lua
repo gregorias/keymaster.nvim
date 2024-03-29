@@ -21,7 +21,7 @@ end
 M.from_wk_keymaps = function(mappings, opts)
 	local table_utils = require("keymaster.table-utils")
 
-	if vim.tbl_islist(mappings) then
+	if mappings[1] ~= nil then
 		opts = table_utils.shallow_copy(opts or {})
 		local prefix = opts.prefix or ""
 		opts.prefix = nil
@@ -36,6 +36,11 @@ M.from_wk_keymaps = function(mappings, opts)
 		}
 		for key, value in pairs(opts) do
 			keymap[key] = value
+		end
+		for key, value in pairs(mappings) do
+			if key ~= 1 and key ~= 2 then
+				keymap[key] = value
+			end
 		end
 
 		return { keymap }
