@@ -2,6 +2,8 @@
 ---
 --- Registry is a singleton object that manages all the registered keymaps and
 --- groups. It provides an observable pattern for keymap observers.
+---
+--- @class Registry
 local Registry = {
 	observers = {},
 	keymaps = {},
