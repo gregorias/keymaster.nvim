@@ -16,3 +16,4 @@ vim.opt.rtp:append(which_key_dir)
 
 vim.cmd("runtime plugin/plenary.vim")
 require("plenary.busted")
+require("tests.assert_extra")

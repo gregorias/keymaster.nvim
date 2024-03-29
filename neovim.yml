@@ -8,20 +8,7 @@ globals:
     args:
       - type: function
   assert:
-    args:
-      - type: bool
-      - type: string
-        required: false
-  assert.are.same:
-    args:
-      - type: any
-      - type: any
-  assert.False:
-    args:
-      - type: bool
-  assert.True:
-    args:
-      - type: bool
+    any: true
   before_each:
     args:
       - type: function
