@@ -1,7 +1,8 @@
 local M = {}
 local registry = require("keymaster.registry")
 
--- TODO: Document this function.
+--- Set up Keymaster.
+---@param config table? Keymaster configuration.
 M.setup = function(config)
 	config = config or {}
 
