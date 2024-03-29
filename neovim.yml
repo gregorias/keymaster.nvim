@@ -16,6 +16,9 @@ globals:
     args:
       - type: any
       - type: any
+  assert.False:
+    args:
+      - type: bool
   assert.True:
     args:
       - type: bool
