@@ -45,6 +45,12 @@ M.set_keymap = function(mappings_or_modes, wk_opts_or_lhs, rhs, opts)
 	end
 end
 
+--- Set a keymap.
+--
+-- An alias for `set_keymap`. Since this plugin is a replacement for
+-- vim.keymap, just `set` makes sense.
+M.set = M.set_keymap
+
 --- Get all set keymaps.
 --
 -- @return A table of all set keymaps.
