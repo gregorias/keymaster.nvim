@@ -28,7 +28,7 @@ end
 --- Get all set keymaps.
 --
 -- @return A table of all set keymaps.
-M.get_keymaps = function(keymap)
+M.get_keymaps = function()
 	return registry.keymaps
 end
 
