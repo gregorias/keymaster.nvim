@@ -7,6 +7,15 @@ describe("keymaster", function()
 		})
 	end)
 
+	it("works with a minimal argument list", function()
+		local has_executed = false
+		keymaster.set_keymap("n", "fx", function()
+			has_executed = true
+		end)
+		vim.api.nvim_feedkeys("fx", "mx", true)
+		assert.True(has_executed)
+	end)
+
 	it("sets a keymap", function()
 		local has_executed = false
 		keymaster.set_keymap("n", "fx", function()

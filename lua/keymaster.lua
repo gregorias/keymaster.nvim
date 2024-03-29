@@ -16,7 +16,7 @@ end
 
 --- Set a keymap.
 M.set_keymap = function(mode, lhs, rhs, opts)
-	-- TODO: Handle nil in arguments.
+	opts = opts or {}
 	registry:add_keymap({
 		lhs = lhs,
 		rhs = rhs,
