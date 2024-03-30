@@ -10,6 +10,10 @@ local Registry = {
 	next_keymap_index = 1,
 }
 
+--- Keymaster keymap.
+---
+--- It is specifically designed to be a natural extension of the vim.keymap.set interface.
+---
 ---@class KeymasterKeymap
 ---@field mode string | string[]
 ---@field lhs string

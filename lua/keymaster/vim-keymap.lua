@@ -4,23 +4,49 @@
 -- @alias M
 local M = {}
 
+---@class VimKeymap
+---@field mode string | string[]
+---@field lhs string
+---@field rhs string | function
+---@field opts table
+
+--- Options taken from https://neovim.io/doc/user/map.html#%3Amap-arguments + noremap.
+---@class VimKeymapOpts
+---@field buffer number?
+---@field nowait boolean?
+---@field silent boolean?
+---@field script boolean?
+---@field expr boolean?
+---@field unique boolean?
+---@field noremap boolean?
+
 --- Transform vim.keymap-style mappings into Keymaster-style mappings.
+---
+---@param mode string | string[]
+---@param lhs string
+---@param rhs string
+---@param opts VimKeymapOpts
+---@return KeymasterKeymap
 M.from_vim_keymap = function(mode, lhs, rhs, opts)
 	opts = opts or {}
+	---@type KeymasterKeymap
 	local keymap = {
-		modes = mode,
+		mode = mode,
 		lhs = lhs,
 		rhs = rhs,
+		opts = {},
 	}
 	for key, value in pairs(opts) do
-		keymap[key] = value
+		keymap.opts[key] = value
 	end
 	return keymap
 end
 
 --- Create a vim.keymap observer.
+---@return Observer
 M.VimKeymap = function()
 	return {
+		---@param keymap KeymasterKeymap
 		notify_keymap_set = function(_, keymap)
 			local opts = {}
 			for key, value in pairs(keymap) do
@@ -40,7 +66,7 @@ M.VimKeymap = function()
 					opts.unique = value
 				end
 			end
-			vim.keymap.set(keymap.modes, keymap.lhs, keymap.rhs, opts)
+			vim.keymap.set(keymap.mode, keymap.lhs, keymap.rhs, opts)
 		end,
 	}
 end

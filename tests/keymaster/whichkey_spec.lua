@@ -3,6 +3,74 @@ local table_utils = require("keymaster.table-utils")
 describe("keymaster.whichkey", function()
 	local keymaster_whichkey = require("keymaster.whichkey")
 
+	describe("to_wk_keymaps", function()
+		local to_wk_keymaps = keymaster_whichkey.to_wk_keymap
+		it("transforms Keymaster keymaps fully", function()
+			---@type KeymasterKeymap
+			local km_keymap = {
+				mode = "x",
+				lhs = "<leader>fgx",
+				rhs = ":fgx action",
+				opts = {
+					description = "fgx action",
+					buffer = 1,
+					silent = true,
+					noremap = true,
+					expr = false,
+					to_be_ignored = "foo",
+				},
+			}
+
+			---@type WhichKeyKeymap
+			local wk_keymap = to_wk_keymaps(km_keymap)
+
+			assert.are.same({
+
+				{
+					["<leader>fgx"] = { ":fgx action", "fgx action" },
+				},
+				{
+					mode = "x",
+					buffer = 1,
+					silent = true,
+					noremap = true,
+					nowait = false,
+					expr = false,
+				},
+			}, wk_keymap)
+		end)
+
+		it("transforms Keymaster keymaps with honoring WK defaults", function()
+			---@type KeymasterKeymap
+			local km_keymap = {
+				mode = { "n", "x" },
+				lhs = "<leader>fgx",
+				rhs = ":fgx action",
+				opts = {
+					description = "fgx action",
+				},
+			}
+
+			---@type WhichKeyKeymap
+			local wk_keymap = to_wk_keymaps(km_keymap)
+
+			assert.are.same({
+
+				{
+					["<leader>fgx"] = { ":fgx action", "fgx action" },
+				},
+				{
+					mode = { "n", "x" },
+					buffer = nil,
+					silent = true,
+					noremap = true,
+					nowait = false,
+					expr = false,
+				},
+			}, wk_keymap)
+		end)
+	end)
+
 	describe("from_wk_keymaps", function()
 		local from_wk_keymaps = keymaster_whichkey.from_wk_keymaps
 
@@ -20,18 +88,22 @@ describe("keymaster.whichkey", function()
 
 			assert.are.with_eq(table_utils.deep_equals).unordered_equal({
 				{
-					modes = "n",
+					mode = "n",
 					lhs = "<leader>fgx",
 					rhs = ":fgx action",
-					description = "fgx action",
-					buffer = 1,
+					opts = {
+						description = "fgx action",
+						buffer = 1,
+					},
 				},
 				{
-					modes = "n",
+					mode = "n",
 					lhs = "<leader>fgy",
 					rhs = ":fgy action",
-					description = "fgy action",
-					buffer = 1,
+					opts = {
+						description = "fgy action",
+						buffer = 1,
+					},
 				},
 			}, km_mappings)
 		end)
@@ -44,11 +116,13 @@ describe("keymaster.whichkey", function()
 
 			assert.are.same({
 				{
-					modes = "i",
+					mode = "i",
 					lhs = "<A-enter>",
 					rhs = "<C-o>o",
-					description = "Start a new line below",
-					noremap = false,
+					opts = {
+						description = "Start a new line below",
+						noremap = false,
+					},
 				},
 			}, km_mappings)
 		end)

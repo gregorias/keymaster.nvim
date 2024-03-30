@@ -4,21 +4,32 @@
 -- @alias M
 local M = {}
 
---- Transform a keymap into a WhichKey keymap.
+--- Transform a Keymaster keymap into a WhichKey keymap.
+---
+---@param keymap KeymasterKeymap
+---@return WhichKeyKeymap
 M.to_wk_keymap = function(keymap)
+	local opts = keymap.opts or {}
+
 	return {
 		{ [keymap.lhs] = {
 			keymap.rhs,
-			keymap.description,
+			opts.description or "",
 		} },
 		{
-			mode = keymap.modes,
+			mode = keymap.mode,
+			buffer = opts.buffer or nil,
+			silent = opts.silent or true,
+			noremap = opts.noremap or true,
+			nowait = opts.nowait or false,
+			expr = opts.expr or false,
 		},
 	}
 end
 
----@alias WhichKeyKeymap table
----@alias WhichKeyKeymappings { [string]: string | WhichKeyKeymappings | WhichKeyKeymap }
+---@alias WhichKeyKeymapping table
+---@alias WhichKeyKeymappings { [string]: string | WhichKeyKeymappings | WhichKeyKeymapping }
+---@alias WhichKeyKeymap { [1]: WhichKeyKeymapping, [2]: WhichKeyOpts }
 
 --- Schema taken from https://github.com/folke/which-key.nvim?tab=readme-ov-file#-setup.
 ---@class WhichKeyOpts
@@ -31,8 +42,9 @@ end
 
 --- Transform Which-Key-style mappings into Keymaster-style mappings.
 ---
----@param mappings WhichKeyKeymappings | WhichKeyKeymap
+---@param mappings WhichKeyKeymappings | WhichKeyKeymapping
 ---@param opts WhichKeyOpts
+---@return KeymasterKeymap[]
 M.from_wk_keymaps = function(mappings, opts)
 	local table_utils = require("keymaster.table-utils")
 
@@ -43,18 +55,21 @@ M.from_wk_keymaps = function(mappings, opts)
 		local mode = opts.mode or "n"
 		opts.mode = nil
 
+		---@type KeymasterKeymap
 		local keymap = {
-			modes = mode,
+			mode = mode,
 			lhs = prefix,
 			rhs = mappings[1],
-			description = mappings[2],
+			opts = {
+				description = mappings[2],
+			},
 		}
 		for key, value in pairs(opts) do
-			keymap[key] = value
+			keymap.opts[key] = value
 		end
 		for key, value in pairs(mappings) do
 			if key ~= 1 and key ~= 2 then
-				keymap[key] = value --[[@as any]]
+				keymap.opts[key] = value --[[@as any]]
 			end
 		end
 

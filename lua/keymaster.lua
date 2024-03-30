@@ -33,11 +33,11 @@ end
 --- Set a keymap.
 --
 -- Accepts both Neovim-like keymap syntax and Which-Key-like keymap syntax.
-M.set_keymap = function(mappings_or_modes, wk_opts_or_lhs, rhs, opts)
-	if type(mappings_or_modes) == "string" or vim.tbl_islist(mappings_or_modes) then
-		set_vim_keymap(mappings_or_modes, wk_opts_or_lhs, rhs, opts)
+M.set_keymap = function(mappings_or_mode, wk_opts_or_lhs, rhs, opts)
+	if type(mappings_or_mode) == "string" or vim.tbl_islist(mappings_or_mode) then
+		set_vim_keymap(mappings_or_mode, wk_opts_or_lhs, rhs, opts)
 	else
-		set_which_key_keymaps(mappings_or_modes, wk_opts_or_lhs)
+		set_which_key_keymaps(mappings_or_mode, wk_opts_or_lhs)
 	end
 end
 

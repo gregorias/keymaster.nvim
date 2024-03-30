@@ -1,5 +1,3 @@
-local table_utils = require("keymaster.table-utils")
-
 describe("keymaster.vim-keymap", function()
 	local keymaster_vim_keymap = require("keymaster.vim-keymap")
 
@@ -12,11 +10,13 @@ describe("keymaster.vim-keymap", function()
 			})
 
 			assert.are.same({
-				modes = "n",
+				mode = "n",
 				lhs = "<leader>fgx",
 				rhs = ":fgx action",
-				description = "fgx action",
-				buffer = 1,
+				opts = {
+					description = "fgx action",
+					buffer = 1,
+				},
 			}, km_mapping)
 		end)
 	end)
