@@ -69,7 +69,7 @@ end
 -- @param wk The WhichKey module.
 M.WhichKeyObserver = function(wk)
 	return {
-		notify_keymap_added = function(_, keymap)
+		notify_keymap_set = function(_, keymap)
 			local mappings, opts = unpack(M.to_wk_keymap(keymap))
 			wk.register(mappings, opts)
 		end,

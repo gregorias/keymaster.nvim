@@ -21,7 +21,7 @@ end
 --- Create a vim.keymap observer.
 M.VimKeymap = function()
 	return {
-		notify_keymap_added = function(_, keymap)
+		notify_keymap_set = function(_, keymap)
 			local opts = {}
 			for key, value in pairs(keymap) do
 				if key == "buffer" then
