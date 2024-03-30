@@ -71,12 +71,12 @@ describe("keymaster.whichkey", function()
 		end)
 	end)
 
-	describe("from_wk_keymaps", function()
-		local from_wk_keymaps = keymaster_whichkey.from_wk_keymaps
+	describe("from_wk_keymappings", function()
+		local from_wk_keymappings = keymaster_whichkey.from_wk_keymappings
 
 		it("transforms wk mappings", function()
-			local km_mappings = from_wk_keymaps({
-				name = "+Ignore",
+			local km_mappings, km_key_groups = from_wk_keymappings({
+				name = "+Foo",
 				g = {
 					x = { ":fgx action", "fgx action" },
 					y = { ":fgy action", "fgy action" },
@@ -106,9 +106,12 @@ describe("keymaster.whichkey", function()
 					},
 				},
 			}, km_mappings)
+			assert.are.same({
+				{ mode = "n", lhs = "<leader>f", opts = { name = "+Foo", buffer = 1 } },
+			}, km_key_groups)
 		end)
 		it("transforms wk mappings with in-keymap options", function()
-			local km_mappings = from_wk_keymaps({
+			local km_mappings = from_wk_keymappings({
 				["<A-enter>"] = { [1] = "<C-o>o", [2] = "Start a new line below", noremap = false },
 			}, {
 				mode = "i",

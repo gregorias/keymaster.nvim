@@ -31,10 +31,10 @@ local Registry = {
 
 --- Keymaster key group.
 ---
----@class KeymasterKeyGroup
+---@class (exact) KeymasterKeyGroup
 ---@field mode string | string[]
 ---@field lhs string
----@field opts { name: string }
+---@field opts { name: string, buffer: number? }
 
 ---@class Observer
 ---@field notify_keymap_set fun(self, keymap: KeymasterKeymap): nil

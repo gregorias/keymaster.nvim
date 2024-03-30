@@ -24,9 +24,12 @@ end
 --- Set keymaps using Which-Key-like keymap syntax.
 local set_which_key_keymaps = function(mappings, opts)
 	opts = opts or {}
-	local which_key_mappings = require("keymaster.whichkey").from_wk_keymaps(mappings, opts)
+	local which_key_mappings, which_key_groups = require("keymaster.whichkey").from_wk_keymappings(mappings, opts)
 	for _, mapping in ipairs(which_key_mappings) do
 		registry:set_keymap(mapping)
+	end
+	for _, group in ipairs(which_key_groups) do
+		registry:set_key_group(group)
 	end
 end
 

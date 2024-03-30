@@ -45,7 +45,8 @@ end
 ---@param mappings WhichKeyKeymappings | WhichKeyKeymapping
 ---@param opts WhichKeyOpts
 ---@return KeymasterKeymap[]
-M.from_wk_keymaps = function(mappings, opts)
+---@return KeymasterKeyGroup[]
+M.from_wk_keymappings = function(mappings, opts)
 	local table_utils = require("keymaster.table-utils")
 
 	if mappings[1] ~= nil then
@@ -73,25 +74,39 @@ M.from_wk_keymaps = function(mappings, opts)
 			end
 		end
 
-		return { keymap }
+		return { keymap }, {}
 	end
 
-	local km_mappings = {}
+	local km_mappings, km_groups = {}, {}
 	opts = table_utils.shallow_copy(opts or {})
 	local prefix = opts.prefix or ""
 	opts.prefix = nil
 
 	for key, value in pairs(mappings) do
-		if key ~= "name" then
-			local subkeymaps = M.from_wk_keymaps(value --[[@as WhichKeyKeymappings | WhichKeyKeymap ]], opts)
+		if key == "name" then
+			table.insert(km_groups, {
+				mode = opts.mode or "n",
+				lhs = prefix or "",
+				opts = {
+					name = value,
+					buffer = opts.buffer or nil,
+				},
+			})
+		else
+			local subkeymaps, subkey_groups =
+				M.from_wk_keymappings(value --[[@as WhichKeyKeymappings | WhichKeyKeymap ]], opts)
 			for _, subkeymap in ipairs(subkeymaps) do
 				subkeymap.lhs = prefix .. key .. subkeymap.lhs
 				table.insert(km_mappings, subkeymap)
 			end
+			for _, subkey_group in ipairs(subkey_groups) do
+				subkey_group.lhs = prefix .. key .. subkey_group.lhs
+				table.insert(km_groups, subkey_group)
+			end
 		end
 	end
 
-	return km_mappings
+	return km_mappings, km_groups
 end
 
 --- Create a WhichKey observer.
@@ -106,6 +121,18 @@ M.WhichKeyObserver = function(wk)
 		end,
 		notify_keymap_deleted = function(_, _)
 			return nil
+		end,
+
+		---@param key_group KeymasterKeyGroup
+		notify_key_group_set = function(_, key_group)
+			wk.register({
+				[key_group.lhs] = {
+					name = key_group.opts.name,
+				},
+			}, {
+				mode = key_group.mode,
+				buffer = key_group.opts.buffer,
+			})
 		end,
 	}
 end
