@@ -110,6 +110,7 @@ describe("keymaster.whichkey", function()
 				{ mode = "n", lhs = "<leader>f", opts = { name = "+Foo", buffer = 1 } },
 			}, km_key_groups)
 		end)
+
 		it("transforms wk mappings with in-keymap options", function()
 			local km_mappings = from_wk_keymappings({
 				["<A-enter>"] = { [1] = "<C-o>o", [2] = "Start a new line below", noremap = false },
@@ -125,6 +126,23 @@ describe("keymaster.whichkey", function()
 					opts = {
 						description = "Start a new line below",
 						noremap = false,
+					},
+				},
+			}, km_mappings)
+		end)
+
+		it("recognizes rhs-free mappings", function()
+			local km_mappings = from_wk_keymappings({
+				["foo"] = "Do Foo",
+			})
+
+			assert.are.same({
+				{
+					mode = "n",
+					lhs = "foo",
+					rhs = nil,
+					opts = {
+						description = "Do Foo",
 					},
 				},
 			}, km_mappings)

@@ -16,10 +16,13 @@ local Registry = {
 ---
 --- It is specifically designed to be a natural extension of the vim.keymap.set interface.
 ---
+--- If rhs is missing, then this keymap is considered to be for information
+--- only, not to be bound.
+---
 ---@class (exact) KeymasterKeymap
 ---@field mode string | string[]
 ---@field lhs string
----@field rhs string | function
+---@field rhs string | function | nil
 ---@field opts KeymasterKeymapOpts
 
 --- Keymaster keymap options.

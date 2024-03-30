@@ -49,7 +49,7 @@ end
 M.from_wk_keymappings = function(mappings, opts)
 	local table_utils = require("keymaster.table-utils")
 
-	if mappings[1] ~= nil then
+	if type(mappings) == "string" or mappings[1] ~= nil then
 		opts = table_utils.shallow_copy(opts or {})
 		local prefix = opts.prefix or ""
 		opts.prefix = nil
@@ -60,17 +60,24 @@ M.from_wk_keymappings = function(mappings, opts)
 		local keymap = {
 			mode = mode,
 			lhs = prefix,
-			rhs = mappings[1],
+			rhs = nil,
 			opts = {
-				description = mappings[2],
+				description = nil,
 			},
 		}
-		for key, value in pairs(opts) do
-			keymap.opts[key] = value
-		end
-		for key, value in pairs(mappings) do
-			if key ~= 1 and key ~= 2 then
-				keymap.opts[key] = value --[[@as any]]
+
+		if type(mappings) == "string" then
+			keymap.opts.description = mappings
+		else
+			keymap.rhs = mappings[1]
+			keymap.opts.description = mappings[2]
+			for key, value in pairs(opts) do
+				keymap.opts[key] = value
+			end
+			for key, value in pairs(mappings) do
+				if key ~= 1 and key ~= 2 then
+					keymap.opts[key] = value --[[@as any]]
+				end
 			end
 		end
 

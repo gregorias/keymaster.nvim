@@ -24,7 +24,7 @@ local M = {}
 ---
 ---@param mode string | string[]
 ---@param lhs string
----@param rhs string
+---@param rhs string?
 ---@param opts VimKeymapOpts
 ---@return KeymasterKeymap
 M.from_vim_keymap = function(mode, lhs, rhs, opts)
@@ -43,11 +43,17 @@ M.from_vim_keymap = function(mode, lhs, rhs, opts)
 end
 
 --- Create a vim.keymap observer.
+---
 ---@return Observer
 M.VimKeymap = function()
 	return {
 		---@param keymap KeymasterKeymap
 		notify_keymap_set = function(_, keymap)
+			if keymap.rhs == nil then
+				-- Ignore info-only keymaps.
+				return nil
+			end
+
 			local opts = {}
 			for key, value in pairs(keymap) do
 				if key == "buffer" then
@@ -67,6 +73,34 @@ M.VimKeymap = function()
 				end
 			end
 			vim.keymap.set(keymap.mode, keymap.lhs, keymap.rhs, opts)
+		end,
+
+		notify_keymap_deleted = function(_, keymap)
+			if keymap.rhs == nil then
+				-- Ignore info-only keymaps.
+				return nil
+			end
+
+			local opts = {}
+			for key, value in pairs(keymap) do
+				if key == "buffer" then
+					opts.buffer = value
+				elseif key == "expr" then
+					opts.expr = value
+				elseif key == "noremap" then
+					opts.noremap = value
+				elseif key == "nowait" then
+					opts.nowait = value
+				elseif key == "script" then
+					opts.script = value
+				elseif key == "silent" then
+					opts.silent = value
+				elseif key == "unique" then
+					opts.unique = value
+				end
+			end
+
+			vim.keymap.del(keymap.mode, keymap.lhs, opts)
 		end,
 	}
 end
