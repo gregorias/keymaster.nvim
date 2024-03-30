@@ -96,12 +96,16 @@ end
 
 --- Create a WhichKey observer.
 --
--- @param wk The WhichKey module.
+---@param wk table The WhichKey module.
+---@return Observer
 M.WhichKeyObserver = function(wk)
 	return {
 		notify_keymap_set = function(_, keymap)
 			local mappings, opts = unpack(M.to_wk_keymap(keymap))
 			wk.register(mappings, opts)
+		end,
+		notify_keymap_deleted = function(_, _)
+			return nil
 		end,
 	}
 end
