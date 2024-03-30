@@ -17,7 +17,22 @@ M.to_wk_keymap = function(keymap)
 	}
 end
 
+---@alias WhichKeyKeymap table
+---@alias WhichKeyKeymappings { [string]: string | WhichKeyKeymappings | WhichKeyKeymap }
+
+--- Schema taken from https://github.com/folke/which-key.nvim?tab=readme-ov-file#-setup.
+---@class WhichKeyOpts
+---@field mode string? | string[]
+---@field prefix string?
+---@field buffer number?
+---@field silent boolean?
+---@field noremap boolean?
+---@field expr boolean?
+
 --- Transform Which-Key-style mappings into Keymaster-style mappings.
+---
+---@param mappings WhichKeyKeymappings | WhichKeyKeymap
+---@param opts WhichKeyOpts
 M.from_wk_keymaps = function(mappings, opts)
 	local table_utils = require("keymaster.table-utils")
 
@@ -39,7 +54,7 @@ M.from_wk_keymaps = function(mappings, opts)
 		end
 		for key, value in pairs(mappings) do
 			if key ~= 1 and key ~= 2 then
-				keymap[key] = value
+				keymap[key] = value --[[@as any]]
 			end
 		end
 
@@ -53,7 +68,7 @@ M.from_wk_keymaps = function(mappings, opts)
 
 	for key, value in pairs(mappings) do
 		if key ~= "name" then
-			local subkeymaps = M.from_wk_keymaps(value, opts)
+			local subkeymaps = M.from_wk_keymaps(value --[[@as WhichKeyKeymappings | WhichKeyKeymap ]], opts)
 			for _, subkeymap in ipairs(subkeymaps) do
 				subkeymap.lhs = prefix .. key .. subkeymap.lhs
 				table.insert(km_mappings, subkeymap)
