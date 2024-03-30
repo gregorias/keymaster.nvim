@@ -8,6 +8,8 @@ local Registry = {
 	observers = {},
 	keymaps = {},
 	next_keymap_index = 1,
+	key_groups = {},
+	next_key_group_index = 1,
 }
 
 --- Keymaster keymap.
@@ -27,9 +29,17 @@ local Registry = {
 ---@class KeymasterKeymapOpts: VimKeymapOpts
 ---@field description string?
 
+--- Keymaster key group.
+---
+---@class KeymasterKeyGroup
+---@field mode string | string[]
+---@field lhs string
+---@field opts { name: string }
+
 ---@class Observer
 ---@field notify_keymap_set fun(self, keymap: KeymasterKeymap): nil
 ---@field notify_keymap_deleted fun(self, keymap: KeymasterKeymap): nil
+---@field notify_key_group_set (fun(self, keymap: KeymasterKeyGroup): nil)?
 
 --- Register an observer.
 ---
@@ -77,6 +87,33 @@ function Registry:delete_keymap(keymap_id)
 	for _, observer in ipairs(self.observers) do
 		observer:notify_keymap_deleted(keymap)
 	end
+end
+
+--- Set a key group.
+---
+---@param key_group KeymasterKeyGroup
+---@return number The id of the set key_group.
+function Registry:set_key_group(key_group)
+	table.insert(self.key_groups, self.next_key_group_index, key_group)
+	self.next_key_group_index = self.next_key_group_index + 1
+	for _, observer in ipairs(self.observers) do
+		if observer.notify_key_group_set then
+			observer:notify_key_group_set(key_group)
+		end
+	end
+	return self.next_key_group_index - 1
+end
+
+--- Delete a key group.
+---
+---@param key_group_id number The id of the key group to delete.
+---@return nil
+function Registry:delete_key_group(key_group_id)
+	local key_group = self.key_groups[key_group_id]
+	if key_group == nil then
+		return
+	end
+	table.remove(self.key_groups, key_group_id)
 end
 
 return Registry
