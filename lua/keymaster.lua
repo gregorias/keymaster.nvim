@@ -50,6 +50,11 @@ end
 -- vim.keymap, just `set` makes sense.
 M.set = M.set_keymap
 
+--- Register a keymap.
+--
+-- An alias for `set_keymap`. Since this plugin is meant to work with Which Key.
+M.register = M.set_keymap
+
 --- Get all set keymaps.
 --
 -- @return A table of all set keymaps.
