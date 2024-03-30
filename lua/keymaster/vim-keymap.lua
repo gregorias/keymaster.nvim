@@ -4,14 +4,14 @@
 -- @alias M
 local M = {}
 
----@class VimKeymap
+---@class (exact) VimKeymap
 ---@field mode string | string[]
 ---@field lhs string
 ---@field rhs string | function
 ---@field opts table
 
 --- Options taken from https://neovim.io/doc/user/map.html#%3Amap-arguments + noremap.
----@class VimKeymapOpts
+---@class (exact) VimKeymapOpts
 ---@field buffer number?
 ---@field nowait boolean?
 ---@field silent boolean?

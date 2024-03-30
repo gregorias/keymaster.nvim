@@ -14,11 +14,18 @@ local Registry = {
 ---
 --- It is specifically designed to be a natural extension of the vim.keymap.set interface.
 ---
----@class KeymasterKeymap
+---@class (exact) KeymasterKeymap
 ---@field mode string | string[]
 ---@field lhs string
 ---@field rhs string | function
----@field opts table
+---@field opts KeymasterKeymapOpts
+
+--- Keymaster keymap options.
+---
+--- In addition to VimKeymapOpts, it also has a description field and user-defined fields.
+---
+---@class KeymasterKeymapOpts: VimKeymapOpts
+---@field description string?
 
 ---@class Observer
 ---@field notify_keymap_set fun(self, keymap: KeymasterKeymap): nil
