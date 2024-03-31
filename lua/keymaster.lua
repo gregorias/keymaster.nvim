@@ -1,24 +1,45 @@
 local M = {}
 local registry = require("keymaster.registry")
 
-local main_observer = nil
+local initial_observers = {}
+
+---@class KeymasterConfig
+---@field disable_legendary boolean?
+---@field disable_which_key boolean?
 
 --- Set up Keymaster.
----@param config table? Keymaster configuration.
+---
+---@param config KeymasterConfig Keymaster configuration.
 M.setup = function(config)
 	config = config or {}
 
-	if config.which_key ~= nil then
-		main_observer = require("keymaster.whichkey").WhichKeyObserver(config.which_key)
+	local vim_keymap_observer = require("keymaster.vim-keymap").VimKeymap()
+	if config.disable_which_key then
+		table.insert(initial_observers, vim_keymap_observer)
 	else
-		main_observer = require("keymaster.vim-keymap").VimKeymap()
+		local which_key_status, which_key = pcall(require, "which-key")
+		if which_key_status then
+			table.insert(initial_observers, require("keymaster.whichkey").WhichKeyObserver(which_key))
+		else
+			table.insert(initial_observers, vim_keymap_observer)
+		end
 	end
-	registry:register_observer(main_observer)
+
+	if not config.disable_legendary and require("keymaster.legendary").is_legendary_installed() then
+		table.insert(initial_observers, require("keymaster.legendary").LegendaryObserver())
+	end
+
+	for _, observer in ipairs(initial_observers) do
+		registry:register_observer(observer)
+	end
 end
 
 --- Shut down Keymaster.
 M.shutdown = function()
-	registry:unregister_observer(main_observer)
+	for _, observer in ipairs(initial_observers) do
+		registry:unregister_observer(observer)
+	end
+	initial_observers = {}
 end
 
 --- Set a keymap using Neovim-like keymap syntax.

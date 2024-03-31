@@ -3,7 +3,8 @@ describe("keymaster", function()
 
 	before_each(function()
 		keymaster.setup({
-			which_key = nil,
+			disable_which_key = true,
+			disable_legendary = true,
 		})
 	end)
 

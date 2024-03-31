@@ -4,11 +4,18 @@
 -- @alias M
 local M = {}
 
+--- Check if Legendary is installed.
+---@return boolean
+M.is_legendary_installed = function()
+	local legendary_status = pcall(require, "legendary")
+	return legendary_status
+end
+
 --- Create a Legendary observer.
 ---
----@param legendary_wk table The legendary.util.which_key module.
 ---@return Observer
-M.LegendaryObserver = function(legendary_wk, do_binding, use_groups)
+M.LegendaryObserver = function(do_binding, use_groups)
+	local legendary_wk = require("legendary.util.which_key")
 	return {
 		notify_keymap_set = function(_, keymap)
 			local mappings, opts = unpack(require("keymaster.whichkey").to_wk_keymap(keymap))
