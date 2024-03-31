@@ -40,7 +40,7 @@ local Registry = {
 
 ---@class Observer
 ---@field notify_keymap_set fun(self, keymap: KeymasterKeymap): nil
----@field notify_keymap_deleted fun(self, keymap: KeymasterKeymap): nil
+---@field notify_keymap_deleted (fun(self, keymap: KeymasterKeymap): nil)?
 ---@field notify_key_group_set (fun(self, keymap: KeymasterKeyGroup): nil)?
 
 --- Register an observer.
@@ -67,7 +67,7 @@ end
 ---@param keymap KeymasterKeymap
 ---@return number The id of the set keymap.
 function Registry:set_keymap(keymap)
-	table.insert(self.keymaps, self.next_keymap_index, keymap)
+	self.keymaps[self.next_keymap_index] = keymap
 	self.next_keymap_index = self.next_keymap_index + 1
 	for _, observer in ipairs(self.observers) do
 		observer:notify_keymap_set(keymap)
@@ -84,7 +84,7 @@ function Registry:delete_keymap(keymap_id)
 	if keymap == nil then
 		return
 	end
-	table.remove(self.keymaps, keymap_id)
+	self.keymaps[keymap_id] = nil
 
 	for _, observer in ipairs(self.observers) do
 		observer:notify_keymap_deleted(keymap)
@@ -96,7 +96,7 @@ end
 ---@param key_group KeymasterKeyGroup
 ---@return number The id of the set key_group.
 function Registry:set_key_group(key_group)
-	table.insert(self.key_groups, self.next_key_group_index, key_group)
+	self.key_groups[self.next_key_group_index] = key_group
 	self.next_key_group_index = self.next_key_group_index + 1
 	for _, observer in ipairs(self.observers) do
 		if observer.notify_key_group_set then
@@ -115,7 +115,7 @@ function Registry:delete_key_group(key_group_id)
 	if key_group == nil then
 		return
 	end
-	table.remove(self.key_groups, key_group_id)
+	self.key_groups[key_group_id] = nil
 end
 
 return Registry

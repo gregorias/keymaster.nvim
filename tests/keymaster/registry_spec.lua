@@ -57,5 +57,43 @@ describe("keymaster.registry", function()
 			registry:delete_key_group(key_group_id)
 			registry:unregister_observer(observer)
 		end)
+
+		it("sets and deletes multiple keymaps", function()
+			-- This indirectly tests that the keymap table is correctly updated.
+			local notified_set_keymaps = {}
+			local notified_deleted_keymaps = {}
+
+			local observer = {
+				notify_keymap_set = function(_, keymap)
+					table.insert(notified_set_keymaps, keymap)
+				end,
+				notify_keymap_deleted = function(_, keymap)
+					table.insert(notified_deleted_keymaps, keymap)
+				end,
+			}
+			registry:register_observer(observer)
+
+			local keymap_id_1 = registry:set_keymap({ mode = "n", lhs = "a", rhs = "b" })
+			local keymap_id_2 = registry:set_keymap({ mode = "n", lhs = "c", rhs = "d" })
+			local keymap_id_3 = registry:set_keymap({ mode = "n", lhs = "e", rhs = "f" })
+
+			registry:delete_keymap(keymap_id_1)
+			registry:delete_keymap(keymap_id_2)
+			registry:delete_keymap(keymap_id_3)
+
+			registry:unregister_observer(observer)
+
+			assert.are.same({
+				{ mode = "n", lhs = "a", rhs = "b" },
+				{ mode = "n", lhs = "c", rhs = "d" },
+				{ mode = "n", lhs = "e", rhs = "f" },
+			}, notified_set_keymaps)
+
+			assert.are.same({
+				{ mode = "n", lhs = "a", rhs = "b" },
+				{ mode = "n", lhs = "c", rhs = "d" },
+				{ mode = "n", lhs = "e", rhs = "f" },
+			}, notified_deleted_keymaps)
+		end)
 	end)
 end)
