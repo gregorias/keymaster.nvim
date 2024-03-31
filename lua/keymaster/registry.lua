@@ -46,7 +46,19 @@ local Registry = {
 --- Register an observer.
 ---
 ---@param observer Observer
-function Registry:register_observer(observer)
+---@param opts { replay_registry: boolean }?
+function Registry:register_observer(observer, opts)
+	opts = opts or {}
+	if opts.replay_registry then
+		for _, keymap in pairs(self.keymaps) do
+			observer:notify_keymap_set(keymap)
+		end
+		for _, key_group in pairs(self.key_groups) do
+			if observer.notify_key_group_set then
+				observer:notify_key_group_set(key_group)
+			end
+		end
+	end
 	table.insert(self.observers, observer)
 end
 
@@ -54,7 +66,7 @@ end
 ---
 ---@param observer Observer
 function Registry:unregister_observer(observer)
-	for i, v in ipairs(self.observers) do
+	for i, v in pairs(self.observers) do
 		if v == observer then
 			table.remove(self.observers, i)
 			break
@@ -69,7 +81,7 @@ end
 function Registry:set_keymap(keymap)
 	self.keymaps[self.next_keymap_index] = keymap
 	self.next_keymap_index = self.next_keymap_index + 1
-	for _, observer in ipairs(self.observers) do
+	for _, observer in pairs(self.observers) do
 		observer:notify_keymap_set(keymap)
 	end
 	return self.next_keymap_index - 1
@@ -86,8 +98,10 @@ function Registry:delete_keymap(keymap_id)
 	end
 	self.keymaps[keymap_id] = nil
 
-	for _, observer in ipairs(self.observers) do
-		observer:notify_keymap_deleted(keymap)
+	for _, observer in pairs(self.observers) do
+		if observer.notify_keymap_deleted then
+			observer:notify_keymap_deleted(keymap)
+		end
 	end
 end
 
@@ -98,7 +112,7 @@ end
 function Registry:set_key_group(key_group)
 	self.key_groups[self.next_key_group_index] = key_group
 	self.next_key_group_index = self.next_key_group_index + 1
-	for _, observer in ipairs(self.observers) do
+	for _, observer in pairs(self.observers) do
 		if observer.notify_key_group_set then
 			observer:notify_key_group_set(key_group)
 		end

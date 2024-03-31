@@ -1,18 +1,24 @@
 local M = {}
 local registry = require("keymaster.registry")
 
+local main_observer = nil
+
 --- Set up Keymaster.
 ---@param config table? Keymaster configuration.
 M.setup = function(config)
 	config = config or {}
 
-	local main_observer = nil
 	if config.which_key ~= nil then
 		main_observer = require("keymaster.whichkey").WhichKeyObserver(config.which_key)
 	else
 		main_observer = require("keymaster.vim-keymap").VimKeymap()
 	end
 	registry:register_observer(main_observer)
+end
+
+--- Shut down Keymaster.
+M.shutdown = function()
+	registry:unregister_observer(main_observer)
 end
 
 --- Set a keymap using Neovim-like keymap syntax.
@@ -82,8 +88,9 @@ end
 --- Register a keymap observer.
 ---
 ---@param observer Observer
-M.register_observer = function(observer)
-	registry:register_observer(observer)
+---@param opts { replay_registry: boolean }?
+M.register_observer = function(observer, opts)
+	registry:register_observer(observer, opts)
 end
 
 --- Unregister a keymap observer.
