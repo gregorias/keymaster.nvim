@@ -12,7 +12,7 @@ describe("keymaster.whichkey", function()
 				lhs = "<leader>fgx",
 				rhs = ":fgx action",
 				opts = {
-					description = "fgx action",
+					desc = "fgx action",
 					buffer = 1,
 					silent = true,
 					noremap = true,
@@ -47,7 +47,7 @@ describe("keymaster.whichkey", function()
 				lhs = "<leader>fgx",
 				rhs = ":fgx action",
 				opts = {
-					description = "fgx action",
+					desc = "fgx action",
 				},
 			}
 
@@ -92,7 +92,7 @@ describe("keymaster.whichkey", function()
 					lhs = "<leader>fgx",
 					rhs = ":fgx action",
 					opts = {
-						description = "fgx action",
+						desc = "fgx action",
 						buffer = 1,
 					},
 				},
@@ -101,7 +101,7 @@ describe("keymaster.whichkey", function()
 					lhs = "<leader>fgy",
 					rhs = ":fgy action",
 					opts = {
-						description = "fgy action",
+						desc = "fgy action",
 						buffer = 1,
 					},
 				},
@@ -124,7 +124,7 @@ describe("keymaster.whichkey", function()
 					lhs = "<A-enter>",
 					rhs = "<C-o>o",
 					opts = {
-						description = "Start a new line below",
+						desc = "Start a new line below",
 						noremap = false,
 					},
 				},
@@ -142,7 +142,7 @@ describe("keymaster.whichkey", function()
 					lhs = "foo",
 					rhs = nil,
 					opts = {
-						description = "Do Foo",
+						desc = "Do Foo",
 					},
 				},
 			}, km_mappings)

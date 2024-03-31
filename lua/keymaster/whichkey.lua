@@ -14,7 +14,7 @@ M.to_wk_keymap = function(keymap)
 	return {
 		{ [keymap.lhs] = {
 			keymap.rhs,
-			opts.description or "",
+			opts.desc or "",
 		} },
 		{
 			mode = keymap.mode,
@@ -62,15 +62,15 @@ M.from_wk_keymappings = function(mappings, opts)
 			lhs = prefix,
 			rhs = nil,
 			opts = {
-				description = nil,
+				desc = nil,
 			},
 		}
 
 		if type(mappings) == "string" then
-			keymap.opts.description = mappings
+			keymap.opts.desc = mappings
 		else
 			keymap.rhs = mappings[1]
-			keymap.opts.description = mappings[2]
+			keymap.opts.desc = mappings[2]
 			for key, value in pairs(opts) do
 				keymap.opts[key] = value
 			end

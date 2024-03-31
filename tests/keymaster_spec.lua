@@ -21,7 +21,7 @@ describe("keymaster", function()
 			local has_executed = false
 			keymaster.set_keymap("n", "fx", function()
 				has_executed = true
-			end, { description = "TEST" })
+			end, { desc = "TEST" })
 
 			vim.api.nvim_feedkeys("fx", "mx", true)
 			assert.True(has_executed)
@@ -63,10 +63,10 @@ describe("keymaster", function()
 			}
 
 			keymaster.register_observer(observer)
-			local keymap_id = keymaster.set("n", "fx", nil, { description = "Do Foo" })
+			local keymap_id = keymaster.set("n", "fx", nil, { desc = "Do Foo" })
 
 			assert.are.same(
-				{ { mode = "n", lhs = "fx", rhs = nil, opts = { description = "Do Foo" } } },
+				{ { mode = "n", lhs = "fx", rhs = nil, opts = { desc = "Do Foo" } } },
 				notified_keymaps
 			)
 
@@ -101,7 +101,7 @@ describe("keymaster", function()
 			})
 
 			assert.are.same(
-				{ { mode = "n", lhs = "foo", rhs = nil, opts = { description = "Do Foo" } } },
+				{ { mode = "n", lhs = "foo", rhs = nil, opts = { desc = "Do Foo" } } },
 				notified_keymaps
 			)
 

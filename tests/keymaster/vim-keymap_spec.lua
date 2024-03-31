@@ -5,7 +5,7 @@ describe("keymaster.vim-keymap", function()
 		local from_vim_keymap = keymaster_vim_keymap.from_vim_keymap
 		it("transforms vim keymap", function()
 			local km_mapping = from_vim_keymap("n", "<leader>fgx", ":fgx action", {
-				description = "fgx action",
+				desc = "fgx action",
 				buffer = 1,
 			})
 
@@ -14,7 +14,7 @@ describe("keymaster.vim-keymap", function()
 				lhs = "<leader>fgx",
 				rhs = ":fgx action",
 				opts = {
-					description = "fgx action",
+					desc = "fgx action",
 					buffer = 1,
 				},
 			}, km_mapping)

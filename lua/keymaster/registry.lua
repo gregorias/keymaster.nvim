@@ -27,10 +27,9 @@ local Registry = {
 
 --- Keymaster keymap options.
 ---
---- In addition to VimKeymapOpts, it also has a description field and user-defined fields.
+--- They can contain arbitrary key-value pairs.
 ---
 ---@class KeymasterKeymapOpts: VimKeymapOpts
----@field description string?
 
 --- Keymaster key group.
 ---
