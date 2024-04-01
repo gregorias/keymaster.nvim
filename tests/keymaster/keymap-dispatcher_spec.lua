@@ -1,5 +1,15 @@
 describe("keymaster.keymap-dispatcher", function()
-	local dispatcher = require("keymaster.keymap-dispatcher")
+	local KeymapDispatcher = require("keymaster.keymap-dispatcher").KeymapDispatcher
+
+	local dispatcher
+
+	before_each(function()
+		dispatcher = KeymapDispatcher:new()
+	end)
+
+	after_each(function()
+		dispatcher = nil
+	end)
 
 	describe("add_observer", function()
 		it("registers an observer that receives keymap events", function()

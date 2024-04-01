@@ -1,5 +1,7 @@
 local M = {}
-local dispatcher = require("keymaster.keymap-dispatcher")
+
+--- The global keymap dispatcher.
+local dispatcher = require("keymaster.keymap-dispatcher").KeymapDispatcher:new()
 
 --- A lazy load observer that stores keymap events till VimEnter.
 ---
@@ -134,8 +136,6 @@ end
 M.add_observer = function(observer)
 	dispatcher:add_observer(observer)
 end
-
--- TODO: This function is not tested.
 
 --- Add a lazy load keymap observer.
 ---

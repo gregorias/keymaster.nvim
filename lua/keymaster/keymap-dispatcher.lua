@@ -1,19 +1,16 @@
 --- The keymap dispatcher, which serves as an observable facade for keymap operations.
 ---
---- TODO: Stop using a singleton like this.
----
---- KeymapDispatcher is a singleton object that forwards all the keymap
---- operations to its observers.
----
 --- This object is purposefully simple in that has a single responsibility: to
 --- notify all observers of keymap operations. The simplicity of this object
 --- enables flexible extension points for the keymap system and avoids the
 --- complexity of managing keymap state.
 ---
 ---@class KeymapDispatcher
-local KeymapDispatcher = {
-	observers = {},
-}
+---@field observers Observer[]
+---@field set_keymap fun(self: KeymapDispatcher, keymap: KeymasterKeymap): nil
+---@field delete_keymap fun(self: KeymapDispatcher, keymap: KeymasterKeymap): nil
+---@field set_key_group fun(self: KeymapDispatcher, key_group: KeymasterKeyGroup): nil
+---@field delete_key_group fun(self: KeymapDispatcher, key_group: KeymasterKeyGroup): nil
 
 --- Keymaster keymap.
 ---
@@ -46,17 +43,31 @@ local KeymapDispatcher = {
 ---@field notify_keymap_deleted (fun(self, keymap: KeymasterKeymap): nil)?
 ---@field notify_key_group_set (fun(self, keymap: KeymasterKeyGroup): nil)?
 
---- Register an observer.
+local M = {}
+
+M.KeymapDispatcher = {}
+
+--- Create a new KeymapDispatcher.
+---
+---@return KeymapDispatcher
+function M.KeymapDispatcher:new()
+	local dispatcher = { observers = {} }
+	setmetatable(dispatcher, self)
+	self.__index = self
+	return dispatcher
+end
+
+--- Add an observer.
 ---
 ---@param observer Observer
-function KeymapDispatcher:add_observer(observer)
+function M.KeymapDispatcher:add_observer(observer)
 	table.insert(self.observers, observer)
 end
 
---- Unregister an observer.
+--- Remove an observer.
 ---
 ---@param observer Observer
-function KeymapDispatcher:remove_observer(observer)
+function M.KeymapDispatcher:remove_observer(observer)
 	for i, v in pairs(self.observers) do
 		if v == observer then
 			table.remove(self.observers, i)
@@ -69,7 +80,7 @@ end
 ---
 ---@param keymap KeymasterKeymap
 ---@return nil
-function KeymapDispatcher:set_keymap(keymap)
+function M.KeymapDispatcher:set_keymap(keymap)
 	for _, observer in pairs(self.observers) do
 		observer:notify_keymap_set(keymap)
 	end
@@ -79,7 +90,7 @@ end
 ---
 ---@param keymap KeymasterKeymap
 ---@return nil
-function KeymapDispatcher:delete_keymap(keymap)
+function M.KeymapDispatcher:delete_keymap(keymap)
 	for _, observer in pairs(self.observers) do
 		if observer.notify_keymap_deleted then
 			observer:notify_keymap_deleted(keymap)
@@ -91,7 +102,7 @@ end
 ---
 ---@param key_group KeymasterKeyGroup
 ---@return nil
-function KeymapDispatcher:set_key_group(key_group)
+function M.KeymapDispatcher:set_key_group(key_group)
 	for _, observer in pairs(self.observers) do
 		if observer.notify_key_group_set then
 			observer:notify_key_group_set(key_group)
@@ -103,7 +114,7 @@ end
 ---
 ---@param key_group KeymasterKeyGroup
 ---@return nil
-function KeymapDispatcher:delete_key_group(key_group)
+function M.KeymapDispatcher:delete_key_group(key_group)
 	for _, observer in pairs(self.observers) do
 		if observer.notify_key_group_deleted then
 			observer:notify_key_group_deleted(key_group)
@@ -111,4 +122,4 @@ function KeymapDispatcher:delete_key_group(key_group)
 	end
 end
 
-return KeymapDispatcher
+return M
