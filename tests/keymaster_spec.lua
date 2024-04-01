@@ -13,8 +13,7 @@ describe("keymaster", function()
 			vim.api.nvim_feedkeys("fx", "mx", true)
 			assert.True(has_executed)
 
-			-- TODO: Add `del` to Keymaster.
-			vim.keymap.del("n", "fx")
+			keymaster.del("n", "fx")
 			keymaster.remove_observer(vim_keymap)
 		end)
 
@@ -30,7 +29,7 @@ describe("keymaster", function()
 			vim.api.nvim_feedkeys("fx", "mx", true)
 			assert.True(has_executed)
 
-			vim.keymap.del("n", "fx")
+			keymaster.del("n", "fx")
 			keymaster.remove_observer(vim_keymap)
 		end)
 
@@ -53,7 +52,7 @@ describe("keymaster", function()
 			vim.api.nvim_feedkeys("fx", "mx", true)
 			assert.True(has_executed)
 
-			vim.keymap.del("n", "fx")
+			keymaster.del("n", "fx")
 			keymaster.remove_observer(vim_keymap)
 		end)
 
@@ -117,8 +116,25 @@ describe("keymaster", function()
 			assert.False(result)
 			assert.is.same(error, "vim/keymap.lua:0: E227: mapping already exists for fx")
 
-			-- TODO: Switch to using keymaster.del.
-			vim.keymap.del("n", "fx", { unique = true })
+			keymaster.del("n", "fx", { unique = true })
+			keymaster.remove_observer(vim_keymap)
+		end)
+	end)
+
+	describe("del", function()
+		-- We want to have an interface consistent with vim.keymap.del.
+		it("returns an error on removing a non-existent keymap", function()
+			local vim_keymap = require("keymaster.vim-keymap").VimKeymap()
+			keymaster.add_observer(vim_keymap)
+
+			local result, error = pcall(function()
+				keymaster.del("n", "fx")
+			end)
+
+			-- This is what `vim.keymap.del` would have returned.
+			assert.False(result)
+			assert.is.same(error, "vim/keymap.lua:0: E31: No such mapping")
+
 			keymaster.remove_observer(vim_keymap)
 		end)
 	end)

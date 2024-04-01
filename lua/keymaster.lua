@@ -108,9 +108,9 @@ M.set_keymap = function(mappings_or_mode, wk_opts_or_lhs, rhs, opts)
 end
 
 --- Set a keymap.
---
--- An alias for `set_keymap`. Since this plugin is a replacement for
--- vim.keymap, just `set` makes sense.
+---
+--- An alias for `set_keymap`. Since this plugin is a replacement for
+--- vim.keymap, just `set` makes sense.
 M.set = M.set_keymap
 
 --- Register a keymap.
@@ -119,11 +119,15 @@ M.set = M.set_keymap
 M.register = M.set_keymap
 
 --- Delete a keymap.
----
----@param keymap_id number The ID of the keymap to delete.
-M.delete_keymap = function(keymap_id)
-	dispatcher:delete_keymap(keymap_id)
+M.delete_keymap = function(mode, lhs, opts)
+	dispatcher:delete_keymap({ mode = mode, lhs = lhs, opts = opts })
 end
+
+--- Delete a keymap.
+---
+--- An alias for `delete_keymap`. Since this plugin is a replacement for
+--- vim.keymap, just `delete` makes sense.
+M.del = M.delete_keymap
 
 --- Get all set keymaps.
 --

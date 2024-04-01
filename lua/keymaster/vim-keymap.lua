@@ -97,12 +97,6 @@ M.VimKeymap = function()
 
 		notify_keymap_deleted = function(_, keymap)
 			-- TODO: Call function handle_keymap_delete. More consistent with React.
-			-- TODO: This seems wrong. vim.keymap.del doesn’t receive rhs anyway.
-			if keymap.rhs == nil then
-				-- Ignore info-only keymaps.
-				return nil
-			end
-
 			local vim_opts = M.to_vim_keymap_opts(keymap.opts or {})
 			vim.keymap.del(keymap.mode, keymap.lhs, vim_opts)
 		end,
