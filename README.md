@@ -2,8 +2,8 @@
 
 _The keymapping solution for the modular age._
 
-Keymaster is a Neovim plugin that provides an extendable keymap _registry_. The
-_registry_ implements [an observer pattern
+Keymaster is a Neovim plugin that provides an extendable keymap _dispatcher_. The
+_dispatcher_ implements [an observer pattern
 interface](https://en.wikipedia.org/wiki/Observer_pattern), which lets
 config and plugin authors create cleaner and more maintainable Lua. The
 benefits of using Keymaster as the keymapping interface include the following:
@@ -11,14 +11,14 @@ benefits of using Keymaster as the keymapping interface include the following:
 - As a Neovim config writer, your keymap observers, like [Which Key] or
   [Legendary], become decoupled. Your [Legendary] setup will not break just
   because you turn off [Which Key].
-- As a config writer, you dynamically add or remove keymap observes without
+- As a config writer, you dynamically add or remove keymap observers without
   changing your existing keymaps. A new plugin comes out that indexes keymaps?
   Just add an _observer_ for it.
 - As a plugin author, you no longer need to provide specialized integrations to
   all other keymap-related plugins. Just implement a simple _observer_ for your
   plugin.
 
-![Keymaster architecture](images/Keymaster-Architecture.png)
+![Keymaster architecture](images/Keymaster-Architecture.jpeg)
 
 ## ⚡️ Requirements
 

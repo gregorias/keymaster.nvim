@@ -1,18 +1,19 @@
 local M = {}
-local registry = require("keymaster.registry")
+local dispatcher = require("keymaster.keymap-dispatcher")
 
 --- A lazy load observer that stores keymap events till VimEnter.
 ---
+--- TODO: Document this in the README.
 --- This observer facilitates users using Keymaster at an arbitrary point in their config and still capturing all relevant events.
 M.neovim_config_load_lazy_load_observer = require("keymaster.lazy-load-observer").LazyLoadObserver()
-registry:register_observer(M.neovim_config_load_lazy_load_observer)
+dispatcher:add_observer(M.neovim_config_load_lazy_load_observer)
 -- CursorHold is used to ensure the observer is removed eventually, even if the
 -- user somehow never calls Keymaster during config time.
 vim.api.nvim_create_autocmd({ "VimEnter", "CursorHold" }, {
 	once = true,
 	callback = function()
 		if M.neovim_config_load_lazy_load_observer then
-			registry:unregister_observer(M.neovim_config_load_lazy_load_observer)
+			dispatcher:remove_observer(M.neovim_config_load_lazy_load_observer)
 			M.neovim_config_load_lazy_load_observer = nil
 		end
 	end,
@@ -52,14 +53,14 @@ M.setup = function(config)
 		if M.neovim_config_load_lazy_load_observer then
 			M.neovim_config_load_lazy_load_observer:load(observer)
 		end
-		registry:register_observer(observer)
+		dispatcher:add_observer(observer)
 	end
 end
 
 --- Shut down Keymaster.
 M.shutdown = function()
 	for _, observer in ipairs(initial_observers) do
-		registry:unregister_observer(observer)
+		dispatcher:remove_observer(observer)
 	end
 	initial_observers = {}
 end
@@ -70,7 +71,7 @@ end
 ---@return number id The keymap ID.
 local set_vim_keymap = function(mode, lhs, rhs, opts)
 	local km_keymap = require("keymaster.vim-keymap").from_vim_keymap(mode, lhs, rhs, opts)
-	return registry:set_keymap(km_keymap)
+	return dispatcher:set_keymap(km_keymap)
 end
 
 --- Set keymaps using Which-Key-like keymap syntax.
@@ -81,11 +82,11 @@ local set_which_key_keymaps = function(mappings, opts)
 	local which_key_mappings, which_key_groups = require("keymaster.whichkey").from_wk_keymappings(mappings, opts)
 	local ids = {}
 	for _, mapping in ipairs(which_key_mappings) do
-		local id = registry:set_keymap(mapping)
+		local id = dispatcher:set_keymap(mapping)
 		table.insert(ids, id)
 	end
 	for _, group in ipairs(which_key_groups) do
-		registry:set_key_group(group)
+		dispatcher:set_key_group(group)
 	end
 	return ids
 end
@@ -118,28 +119,28 @@ M.register = M.set_keymap
 ---
 ---@param keymap_id number The ID of the keymap to delete.
 M.delete_keymap = function(keymap_id)
-	registry:delete_keymap(keymap_id)
+	dispatcher:delete_keymap(keymap_id)
 end
 
 --- Get all set keymaps.
 --
 -- @return A table of all set keymaps.
 M.get_keymaps = function()
-	return registry.keymaps
+	return dispatcher.keymaps
 end
 
 --- Register a keymap observer.
 ---
 ---@param observer Observer
-M.register_observer = function(observer)
-	registry:register_observer(observer)
+M.add_observer = function(observer)
+	dispatcher:add_observer(observer)
 end
 
 --- Unregister a keymap observer.
 ---
 ---@param observer Observer
-M.unregister_observer = function(observer)
-	registry:unregister_observer(observer)
+M.remove_observer = function(observer)
+	dispatcher:remove_observer(observer)
 end
 
 return M

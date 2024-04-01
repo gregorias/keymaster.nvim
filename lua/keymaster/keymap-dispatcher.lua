@@ -1,13 +1,17 @@
---- The Keymaster registry
+--- The keymap dispatcher, which serves as an observable facade for keymap operations.
 ---
 --- TODO: Stop using a singleton like this.
---- TODO: Rename to a dispatcher.
 ---
---- Registry is a singleton object that manages all the registered keymaps and
---- groups. It provides an observable pattern for keymap observers.
+--- KeymapDispatcher is a singleton object that forwards all the keymap
+--- operations to its observers.
 ---
----@class Registry
-local Registry = {
+--- This object is purposefully simple in that has a single responsibility: to
+--- notify all observers of keymap operations. The simplicity of this object
+--- enables flexible extension points for the keymap system and avoids the
+--- complexity of managing keymap state.
+---
+---@class KeymapDispatcher
+local KeymapDispatcher = {
 	observers = {},
 }
 
@@ -45,14 +49,14 @@ local Registry = {
 --- Register an observer.
 ---
 ---@param observer Observer
-function Registry:register_observer(observer)
+function KeymapDispatcher:add_observer(observer)
 	table.insert(self.observers, observer)
 end
 
 --- Unregister an observer.
 ---
 ---@param observer Observer
-function Registry:unregister_observer(observer)
+function KeymapDispatcher:remove_observer(observer)
 	for i, v in pairs(self.observers) do
 		if v == observer then
 			table.remove(self.observers, i)
@@ -65,7 +69,7 @@ end
 ---
 ---@param keymap KeymasterKeymap
 ---@return nil
-function Registry:set_keymap(keymap)
+function KeymapDispatcher:set_keymap(keymap)
 	for _, observer in pairs(self.observers) do
 		observer:notify_keymap_set(keymap)
 	end
@@ -75,7 +79,7 @@ end
 ---
 ---@param keymap KeymasterKeymap
 ---@return nil
-function Registry:delete_keymap(keymap)
+function KeymapDispatcher:delete_keymap(keymap)
 	for _, observer in pairs(self.observers) do
 		if observer.notify_keymap_deleted then
 			observer:notify_keymap_deleted(keymap)
@@ -87,7 +91,7 @@ end
 ---
 ---@param key_group KeymasterKeyGroup
 ---@return nil
-function Registry:set_key_group(key_group)
+function KeymapDispatcher:set_key_group(key_group)
 	for _, observer in pairs(self.observers) do
 		if observer.notify_key_group_set then
 			observer:notify_key_group_set(key_group)
@@ -99,7 +103,7 @@ end
 ---
 ---@param key_group KeymasterKeyGroup
 ---@return nil
-function Registry:delete_key_group(key_group)
+function KeymapDispatcher:delete_key_group(key_group)
 	for _, observer in pairs(self.observers) do
 		if observer.notify_key_group_deleted then
 			observer:notify_key_group_deleted(key_group)
@@ -107,4 +111,4 @@ function Registry:delete_key_group(key_group)
 	end
 end
 
-return Registry
+return KeymapDispatcher

@@ -59,12 +59,12 @@ describe("keymaster", function()
 				end,
 			}
 
-			keymaster.register_observer(observer)
+			keymaster.add_observer(observer)
 			keymaster.set("n", "fx", nil, { desc = "Do Foo" })
 
 			assert.are.same({ { mode = "n", lhs = "fx", rhs = nil, opts = { desc = "Do Foo" } } }, notified_keymaps)
 
-			keymaster.unregister_observer(observer)
+			keymaster.remove_observer(observer)
 		end)
 
 		it("supports rhs-free keymaps with Which Key syntax", function()
@@ -85,12 +85,12 @@ describe("keymaster", function()
 				end,
 			}
 
-			keymaster.register_observer(observer)
+			keymaster.add_observer(observer)
 			keymaster.set({ ["foo"] = "Do Foo" })
 
 			assert.are.same({ { mode = "n", lhs = "foo", rhs = nil, opts = { desc = "Do Foo" } } }, notified_keymaps)
 
-			keymaster.unregister_observer(observer)
+			keymaster.remove_observer(observer)
 		end)
 	end)
 end)

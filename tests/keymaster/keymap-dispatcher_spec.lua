@@ -1,7 +1,7 @@
-describe("keymaster.registry", function()
-	local registry = require("keymaster.registry")
+describe("keymaster.keymap-dispatcher", function()
+	local dispatcher = require("keymaster.keymap-dispatcher")
 
-	describe("register_observer", function()
+	describe("add_observer", function()
 		it("registers an observer that receives keymap events", function()
 			local notified_keymaps = {}
 
@@ -12,7 +12,7 @@ describe("keymaster.registry", function()
 				end,
 				notify_keymap_deleted = function(_, keymap)
 					for i, v in ipairs(notified_keymaps) do
-						if require('keymaster.table-utils').deep_equals(v, keymap) then
+						if require("keymaster.table-utils").deep_equals(v, keymap) then
 							table.remove(notified_keymaps, i)
 							break
 						end
@@ -20,16 +20,16 @@ describe("keymaster.registry", function()
 				end,
 			}
 
-			registry:register_observer(observer)
-			registry:set_keymap({ mode = "n", lhs = "a", rhs = "b", opts = {} })
+			dispatcher:add_observer(observer)
+			dispatcher:set_keymap({ mode = "n", lhs = "a", rhs = "b", opts = {} })
 
 			assert.are.same({ { mode = "n", lhs = "a", rhs = "b", opts = {} } }, notified_keymaps)
 
-			registry:delete_keymap({ mode = "n", lhs = "a", rhs = "b", opts = {} })
+			dispatcher:delete_keymap({ mode = "n", lhs = "a", rhs = "b", opts = {} })
 
 			assert.are.same({}, notified_keymaps)
 
-			registry:unregister_observer(observer)
+			dispatcher:remove_observer(observer)
 		end)
 
 		it("registers an observer that receives key group events", function()
@@ -49,13 +49,13 @@ describe("keymaster.registry", function()
 				end,
 			}
 
-			registry:register_observer(observer)
-			registry:set_key_group({ mode = "n", lhs = "<leader>g", opts = { name = "+Git" } })
+			dispatcher:add_observer(observer)
+			dispatcher:set_key_group({ mode = "n", lhs = "<leader>g", opts = { name = "+Git" } })
 
 			assert.are.same({ { mode = "n", lhs = "<leader>g", opts = { name = "+Git" } } }, notified_key_groups)
 
-			registry:delete_key_group({ mode = "n", lhs = "<leader>g", opts = { name = "+Git" } })
-			registry:unregister_observer(observer)
+			dispatcher:delete_key_group({ mode = "n", lhs = "<leader>g", opts = { name = "+Git" } })
+			dispatcher:remove_observer(observer)
 		end)
 
 		it("sets and deletes multiple keymaps", function()
@@ -71,16 +71,16 @@ describe("keymaster.registry", function()
 					table.insert(notified_deleted_keymaps, keymap)
 				end,
 			}
-			registry:register_observer(observer)
+			dispatcher:add_observer(observer)
 
-			registry:set_keymap({ mode = "n", lhs = "a", rhs = "b" })
-			registry:set_keymap({ mode = "n", lhs = "c", rhs = "d" })
-			registry:set_keymap({ mode = "n", lhs = "e", rhs = "f" })
-			registry:delete_keymap({ mode = "n", lhs = "a", rhs = "b" })
-			registry:delete_keymap({ mode = "n", lhs = "c", rhs = "d" })
-			registry:delete_keymap({ mode = "n", lhs = "e", rhs = "f" })
+			dispatcher:set_keymap({ mode = "n", lhs = "a", rhs = "b" })
+			dispatcher:set_keymap({ mode = "n", lhs = "c", rhs = "d" })
+			dispatcher:set_keymap({ mode = "n", lhs = "e", rhs = "f" })
+			dispatcher:delete_keymap({ mode = "n", lhs = "a", rhs = "b" })
+			dispatcher:delete_keymap({ mode = "n", lhs = "c", rhs = "d" })
+			dispatcher:delete_keymap({ mode = "n", lhs = "e", rhs = "f" })
 
-			registry:unregister_observer(observer)
+			dispatcher:remove_observer(observer)
 
 			assert.are.same({
 				{ mode = "n", lhs = "a", rhs = "b" },
