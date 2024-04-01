@@ -6,10 +6,6 @@
 ---@class Registry
 local Registry = {
 	observers = {},
-	keymaps = {},
-	next_keymap_index = 1,
-	key_groups = {},
-	next_key_group_index = 1,
 }
 
 --- Keymaster keymap.
@@ -46,19 +42,7 @@ local Registry = {
 --- Register an observer.
 ---
 ---@param observer Observer
----@param opts { replay_registry: boolean }?
-function Registry:register_observer(observer, opts)
-	opts = opts or {}
-	if opts.replay_registry then
-		for _, keymap in pairs(self.keymaps) do
-			observer:notify_keymap_set(keymap)
-		end
-		for _, key_group in pairs(self.key_groups) do
-			if observer.notify_key_group_set then
-				observer:notify_key_group_set(key_group)
-			end
-		end
-	end
+function Registry:register_observer(observer)
 	table.insert(self.observers, observer)
 end
 
@@ -77,27 +61,18 @@ end
 --- Set a keymap.
 ---
 ---@param keymap KeymasterKeymap
----@return number The id of the set keymap.
+---@return nil
 function Registry:set_keymap(keymap)
-	self.keymaps[self.next_keymap_index] = keymap
-	self.next_keymap_index = self.next_keymap_index + 1
 	for _, observer in pairs(self.observers) do
 		observer:notify_keymap_set(keymap)
 	end
-	return self.next_keymap_index - 1
 end
 
 --- Delete a keymap.
 ---
----@param keymap_id number The id of the keymap to delete.
+---@param keymap KeymasterKeymap
 ---@return nil
-function Registry:delete_keymap(keymap_id)
-	local keymap = self.keymaps[keymap_id]
-	if keymap == nil then
-		return
-	end
-	self.keymaps[keymap_id] = nil
-
+function Registry:delete_keymap(keymap)
 	for _, observer in pairs(self.observers) do
 		if observer.notify_keymap_deleted then
 			observer:notify_keymap_deleted(keymap)
@@ -108,28 +83,25 @@ end
 --- Set a key group.
 ---
 ---@param key_group KeymasterKeyGroup
----@return number The id of the set key_group.
+---@return nil
 function Registry:set_key_group(key_group)
-	self.key_groups[self.next_key_group_index] = key_group
-	self.next_key_group_index = self.next_key_group_index + 1
 	for _, observer in pairs(self.observers) do
 		if observer.notify_key_group_set then
 			observer:notify_key_group_set(key_group)
 		end
 	end
-	return self.next_key_group_index - 1
 end
 
 --- Delete a key group.
 ---
----@param key_group_id number The id of the key group to delete.
+---@param key_group KeymasterKeyGroup
 ---@return nil
-function Registry:delete_key_group(key_group_id)
-	local key_group = self.key_groups[key_group_id]
-	if key_group == nil then
-		return
+function Registry:delete_key_group(key_group)
+	for _, observer in pairs(self.observers) do
+		if observer.notify_key_group_deleted then
+			observer:notify_key_group_deleted(key_group)
+		end
 	end
-	self.key_groups[key_group_id] = nil
 end
 
 return Registry

@@ -12,7 +12,7 @@ describe("keymaster.registry", function()
 				end,
 				notify_keymap_deleted = function(_, keymap)
 					for i, v in ipairs(notified_keymaps) do
-						if v == keymap then
+						if require('keymaster.table-utils').deep_equals(v, keymap) then
 							table.remove(notified_keymaps, i)
 							break
 						end
@@ -21,11 +21,11 @@ describe("keymaster.registry", function()
 			}
 
 			registry:register_observer(observer)
-			local keymap_id = registry:set_keymap({ mode = "n", lhs = "a", rhs = "b", opts = {} })
+			registry:set_keymap({ mode = "n", lhs = "a", rhs = "b", opts = {} })
 
 			assert.are.same({ { mode = "n", lhs = "a", rhs = "b", opts = {} } }, notified_keymaps)
 
-			registry:delete_keymap(keymap_id)
+			registry:delete_keymap({ mode = "n", lhs = "a", rhs = "b", opts = {} })
 
 			assert.are.same({}, notified_keymaps)
 
@@ -50,11 +50,11 @@ describe("keymaster.registry", function()
 			}
 
 			registry:register_observer(observer)
-			local key_group_id = registry:set_key_group({ mode = "n", lhs = "<leader>g", opts = { name = "+Git" } })
+			registry:set_key_group({ mode = "n", lhs = "<leader>g", opts = { name = "+Git" } })
 
 			assert.are.same({ { mode = "n", lhs = "<leader>g", opts = { name = "+Git" } } }, notified_key_groups)
 
-			registry:delete_key_group(key_group_id)
+			registry:delete_key_group({ mode = "n", lhs = "<leader>g", opts = { name = "+Git" } })
 			registry:unregister_observer(observer)
 		end)
 
@@ -73,13 +73,12 @@ describe("keymaster.registry", function()
 			}
 			registry:register_observer(observer)
 
-			local keymap_id_1 = registry:set_keymap({ mode = "n", lhs = "a", rhs = "b" })
-			local keymap_id_2 = registry:set_keymap({ mode = "n", lhs = "c", rhs = "d" })
-			local keymap_id_3 = registry:set_keymap({ mode = "n", lhs = "e", rhs = "f" })
-
-			registry:delete_keymap(keymap_id_1)
-			registry:delete_keymap(keymap_id_2)
-			registry:delete_keymap(keymap_id_3)
+			registry:set_keymap({ mode = "n", lhs = "a", rhs = "b" })
+			registry:set_keymap({ mode = "n", lhs = "c", rhs = "d" })
+			registry:set_keymap({ mode = "n", lhs = "e", rhs = "f" })
+			registry:delete_keymap({ mode = "n", lhs = "a", rhs = "b" })
+			registry:delete_keymap({ mode = "n", lhs = "c", rhs = "d" })
+			registry:delete_keymap({ mode = "n", lhs = "e", rhs = "f" })
 
 			registry:unregister_observer(observer)
 
