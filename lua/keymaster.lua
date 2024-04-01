@@ -3,7 +3,6 @@ local dispatcher = require("keymaster.keymap-dispatcher")
 
 --- A lazy load observer that stores keymap events till VimEnter.
 ---
---- TODO: Document this in the README.
 --- This observer facilitates users using Keymaster at an arbitrary point in their config and still capturing all relevant events.
 M.neovim_config_load_lazy_load_observer = require("keymaster.lazy-load-observer").LazyLoadObserver()
 dispatcher:add_observer(M.neovim_config_load_lazy_load_observer)
@@ -129,14 +128,38 @@ M.get_keymaps = function()
 	return dispatcher.keymaps
 end
 
---- Register a keymap observer.
+--- Add a keymap observer.
 ---
 ---@param observer Observer
 M.add_observer = function(observer)
 	dispatcher:add_observer(observer)
 end
 
---- Unregister a keymap observer.
+-- TODO: This function is not tested.
+
+--- Add a lazy load keymap observer.
+---
+--- This function facilitates lazy loading of keymap observers. Call this
+--- function during config initialization. Once you are ready to add the final
+--- observer, call the callback with it.
+---
+---@param opts { disable_config_time_events: boolean? }?
+---@return function(observer:Observer):nil on_load The callback that will replay recorded events and add the observer.
+M.add_lazy_load_observer = function(opts)
+	opts = opts or {}
+	local lazy_load_observer = require("keymaster.lazy-load-observer").LazyLoadObserver()
+	if not opts.disable_config_time_events and M.neovim_config_load_lazy_load_observer then
+		M.neovim_config_load_lazy_load_observer:load(lazy_load_observer)
+	end
+	M.add_observer(lazy_load_observer)
+	return function(observer)
+		lazy_load_observer:load(observer)
+		M.remove_observer(lazy_load_observer)
+		M.add_observer(observer)
+	end
+end
+
+--- Remove a keymap observer.
 ---
 ---@param observer Observer
 M.remove_observer = function(observer)

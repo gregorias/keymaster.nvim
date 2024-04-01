@@ -1,4 +1,8 @@
 --- An observer for lazy loading.
+---
+--- A previous design of this plugin had the dispatcher (than called
+--- “registry”) store all events. Using observers for this purpose is better.
+--- Observers are more flexible and simpler.
 local M = {}
 
 --- Create a LazyLoadObserver.

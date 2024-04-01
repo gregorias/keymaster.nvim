@@ -15,7 +15,8 @@ This project requires the following tools:
 lefthook install
 ```
 
-## Architectural decision records
+TODO: Document why I don’t use the Neovim event bus (it’s a global singleton,
+lazy load observer needs private notifications).
 
 [Commitlint]: https://github.com/conventional-changelog/commitlint
 [Lefthook]: https://github.com/evilmartians/lefthook

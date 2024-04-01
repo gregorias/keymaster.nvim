@@ -93,4 +93,23 @@ describe("keymaster", function()
 			keymaster.remove_observer(observer)
 		end)
 	end)
+
+	describe("add_lazy_load_observer", function()
+		it("stores and replay events", function()
+			local on_observer_load = keymaster.add_lazy_load_observer({ disable_config_time_events = true })
+			keymaster.set_keymap("n", "fx", nil, { desc = "TEST" })
+			local notified_keymaps = {}
+			---@type Observer
+			local observer = {
+				notify_keymap_set = function(_, keymap)
+					table.insert(notified_keymaps, keymap)
+				end,
+			}
+			on_observer_load(observer)
+
+			assert.are.same({ { mode = "n", lhs = "fx", rhs = nil, opts = { desc = "TEST" } } }, notified_keymaps)
+
+			keymaster.remove_observer(observer)
+		end)
+	end)
 end)
