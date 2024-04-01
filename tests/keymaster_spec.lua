@@ -1,28 +1,27 @@
 describe("keymaster", function()
 	local keymaster = require("keymaster")
 
-	before_each(function()
-		keymaster.setup({
-			disable_which_key = true,
-			disable_legendary = true,
-		})
-	end)
-
-	after_each(function()
-		keymaster.shutdown()
-	end)
-
 	describe("set_keymap", function()
 		it("works with a minimal argument list", function()
+			local vim_keymap = require("keymaster.vim-keymap").VimKeymap()
+			keymaster.add_observer(vim_keymap)
+
 			local has_executed = false
 			keymaster.set_keymap("n", "fx", function()
 				has_executed = true
 			end)
 			vim.api.nvim_feedkeys("fx", "mx", true)
 			assert.True(has_executed)
+
+			-- TODO: Add `del` to Keymaster.
+			vim.keymap.del("n", "fx")
+			keymaster.remove_observer(vim_keymap)
 		end)
 
 		it("sets a keymap", function()
+			local vim_keymap = require("keymaster.vim-keymap").VimKeymap()
+			keymaster.add_observer(vim_keymap)
+
 			local has_executed = false
 			keymaster.set_keymap("n", "fx", function()
 				has_executed = true
@@ -30,9 +29,15 @@ describe("keymaster", function()
 
 			vim.api.nvim_feedkeys("fx", "mx", true)
 			assert.True(has_executed)
+
+			vim.keymap.del("n", "fx")
+			keymaster.remove_observer(vim_keymap)
 		end)
 
 		it("supports Which-Key-like syntax", function()
+			local vim_keymap = require("keymaster.vim-keymap").VimKeymap()
+			keymaster.add_observer(vim_keymap)
+
 			local has_executed = false
 			keymaster.set_keymap({
 				f = {
@@ -47,6 +52,9 @@ describe("keymaster", function()
 
 			vim.api.nvim_feedkeys("fx", "mx", true)
 			assert.True(has_executed)
+
+			vim.keymap.del("n", "fx")
+			keymaster.remove_observer(vim_keymap)
 		end)
 
 		it("supports rhs-free keymaps with Vim syntax", function()
@@ -91,6 +99,27 @@ describe("keymaster", function()
 			assert.are.same({ { mode = "n", lhs = "foo", rhs = nil, opts = { desc = "Do Foo" } } }, notified_keymaps)
 
 			keymaster.remove_observer(observer)
+		end)
+	end)
+
+	describe("set", function()
+		-- We want to have an interface consistent with vim.keymap.set.
+		it("returns an error on duplicate unique keymaps", function()
+			local vim_keymap = require("keymaster.vim-keymap").VimKeymap()
+			keymaster.add_observer(vim_keymap)
+
+			keymaster.set("n", "fx", function() end, { unique = true })
+			local result, error = pcall(function()
+				keymaster.set("n", "fx", function() end, { unique = true })
+			end)
+
+			-- This is what `vim.keymap.set` would have returned.
+			assert.False(result)
+			assert.is.same(error, "vim/keymap.lua:0: E227: mapping already exists for fx")
+
+			-- TODO: Switch to using keymaster.del.
+			vim.keymap.del("n", "fx", { unique = true })
+			keymaster.remove_observer(vim_keymap)
 		end)
 	end)
 

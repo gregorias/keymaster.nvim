@@ -22,11 +22,13 @@ vim.api.nvim_create_autocmd({ "VimEnter", "CursorHold" }, {
 
 local initial_observers = {}
 
----@class KeymasterConfig
+---@class (exact) KeymasterConfig
 ---@field disable_legendary boolean?
 ---@field disable_which_key boolean?
 
 --- Set up Keymaster.
+---
+--- TODO: Test this function and config-time setup in general.
 ---
 ---@param config KeymasterConfig Keymaster configuration.
 M.setup = function(config)
