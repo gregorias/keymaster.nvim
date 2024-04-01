@@ -17,7 +17,17 @@ lefthook install
 
 ## Architectural decision records
 
-### Reusing Neovim’s event bus
+### Consistency with `vim.keymap`
+
+The Keymaster module (`keymaster`) purposefully has an interface consistent
+with `vim.keymap`:
+
+- This allows people to use `keymaster` whenever they would use `vim.keymap`
+  freely, decreasing the costs to change.
+- Plugin can use dependency injection for `vim.keymap` and clients can provide
+  `keymaster` when they wish for that extra power.
+
+### Not reusing Neovim’s event bus
 
 Neovim comes with its own event and observer mechanism using autocmd. This
 plugin doesn’t reuse it, because that event bus is a global singleton.
