@@ -15,8 +15,15 @@ This project requires the following tools:
 lefthook install
 ```
 
-TODO: Document why I don’t use the Neovim event bus (it’s a global singleton,
-lazy load observer needs private notifications).
+## Architectural decision records
+
+### Reusing Neovim’s event bus
+
+Neovim comes with its own event and observer mechanism using autocmd. This
+plugin doesn’t reuse it, because that event bus is a global singleton.
+It’s impossible to implement that kind of private passing of events like this
+plugin does for `keymaster.add_lazy_load_observer` with it. It’s also harder to
+test.
 
 [Commitlint]: https://github.com/conventional-changelog/commitlint
 [Lefthook]: https://github.com/evilmartians/lefthook
