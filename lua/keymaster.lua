@@ -1,6 +1,23 @@
 local M = {}
 local registry = require("keymaster.registry")
 
+--- A lazy load observer that stores keymap events till VimEnter.
+---
+--- This observer facilitates users using Keymaster at an arbitrary point in their config and still capturing all relevant events.
+M.neovim_config_load_lazy_load_observer = require("keymaster.lazy-load-observer").LazyLoadObserver()
+registry:register_observer(M.neovim_config_load_lazy_load_observer)
+-- CursorHold is used to ensure the observer is removed eventually, even if the
+-- user somehow never calls Keymaster during config time.
+vim.api.nvim_create_autocmd({ "VimEnter", "CursorHold" }, {
+	once = true,
+	callback = function()
+		if M.neovim_config_load_lazy_load_observer then
+			registry:unregister_observer(M.neovim_config_load_lazy_load_observer)
+			M.neovim_config_load_lazy_load_observer = nil
+		end
+	end,
+})
+
 local initial_observers = {}
 
 ---@class KeymasterConfig
@@ -17,6 +34,8 @@ M.setup = function(config)
 	if config.disable_which_key then
 		table.insert(initial_observers, vim_keymap_observer)
 	else
+		-- TODO: This code is ugly. Refactor it.
+		-- TODO: Legendary has its own specialized function for checking if it’s installed.
 		local which_key_status, which_key = pcall(require, "which-key")
 		if which_key_status then
 			table.insert(initial_observers, require("keymaster.whichkey").WhichKeyObserver(which_key))
@@ -30,6 +49,9 @@ M.setup = function(config)
 	end
 
 	for _, observer in ipairs(initial_observers) do
+		if M.neovim_config_load_lazy_load_observer then
+			M.neovim_config_load_lazy_load_observer:load(observer)
+		end
 		registry:register_observer(observer)
 	end
 end
@@ -109,9 +131,8 @@ end
 --- Register a keymap observer.
 ---
 ---@param observer Observer
----@param opts { replay_registry: boolean }?
-M.register_observer = function(observer, opts)
-	registry:register_observer(observer, opts)
+M.register_observer = function(observer)
+	registry:register_observer(observer)
 end
 
 --- Unregister a keymap observer.

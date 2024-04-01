@@ -1,5 +1,8 @@
 --- The Keymaster registry
 ---
+--- TODO: Stop using a singleton like this.
+--- TODO: Rename to a dispatcher.
+---
 --- Registry is a singleton object that manages all the registered keymaps and
 --- groups. It provides an observable pattern for keymap observers.
 ---
