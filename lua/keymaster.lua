@@ -1,14 +1,14 @@
 local M = {}
 
 --- The global keymap dispatcher.
--- TODO: Don’t do this. Add an ADR that we’ll always rely on initialization in `setup`.
 local dispatcher = require("keymaster.keymap-dispatcher").KeymapDispatcher:new()
 
---- A lazy load observer that stores keymap events till VimEnter.
+--- An event registry observer that stores keymap events till VimEnter.
 ---
---- This observer facilitates users using Keymaster at an arbitrary point in their config and still capturing all relevant events.
--- TODO: Don’t do this. Add an ADR that we’ll always rely on initialization in `setup`.
--- TODO: Add warnings if someone uses Keymaster’s functions before `setup`.
+--- This observer facilitates users using Keymaster at an arbitrary point in
+--- their config lifetime and still capturing all relevant events to be
+--- replayed to final observers.
+---@type EventRegistryObserver
 M.neovim_config_load_event_registry_observer = require("keymaster.event-registry-observer").EventRegistryObserver:new()
 dispatcher:add_observer(M.neovim_config_load_event_registry_observer)
 -- CursorHold is used to ensure the observer is removed eventually, even if the
@@ -30,6 +30,9 @@ local initial_observers = {}
 ---@field disable_which_key boolean?
 
 --- Set up Keymaster.
+---
+--- This is an optional function for those folks who don’t want to deal with
+--- configuring anything. It’s plug-and-play.
 ---
 --- TODO: Test this function and config-time setup in general.
 ---
@@ -131,13 +134,6 @@ end
 --- An alias for `delete_keymap`. Since this plugin is a replacement for
 --- vim.keymap, just `delete` makes sense.
 M.del = M.delete_keymap
-
---- Get all set keymaps.
---
--- @return A table of all set keymaps.
-M.get_keymaps = function()
-	return dispatcher.keymaps
-end
 
 --- Add a keymap observer.
 ---
