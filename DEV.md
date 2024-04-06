@@ -17,6 +17,17 @@ lefthook install
 
 ## Architectural decision records
 
+### Requiring the plugin is enough to use it
+
+This plugin provides a fundamental interface that can be called early in
+configs, for example, in init functions. Lazy.nvim doesn’t guarantee that
+Keymaster’s config will be called if another plugin requires it from the init
+function, so Keymaster has to have sensible behavior even from just being
+required.
+
+Fortunately, Lazy.nvim always installs plugins before calling inits, so the
+requires will always succeed after Lazy reads the plugin spec.
+
 ### Consistency with `vim.keymap`
 
 The Keymaster module (`keymaster`) purposefully has an interface consistent
