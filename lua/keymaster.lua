@@ -1,21 +1,24 @@
 local M = {}
 
 --- The global keymap dispatcher.
+-- TODO: Don’t do this. Add an ADR that we’ll always rely on initialization in `setup`.
 local dispatcher = require("keymaster.keymap-dispatcher").KeymapDispatcher:new()
 
 --- A lazy load observer that stores keymap events till VimEnter.
 ---
 --- This observer facilitates users using Keymaster at an arbitrary point in their config and still capturing all relevant events.
-M.neovim_config_load_lazy_load_observer = require("keymaster.lazy-load-observer").LazyLoadObserver()
-dispatcher:add_observer(M.neovim_config_load_lazy_load_observer)
+-- TODO: Don’t do this. Add an ADR that we’ll always rely on initialization in `setup`.
+-- TODO: Add warnings if someone uses Keymaster’s functions before `setup`.
+M.neovim_config_load_event_registry_observer = require("keymaster.event-registry-observer").EventRegistryObserver:new()
+dispatcher:add_observer(M.neovim_config_load_event_registry_observer)
 -- CursorHold is used to ensure the observer is removed eventually, even if the
 -- user somehow never calls Keymaster during config time.
 vim.api.nvim_create_autocmd({ "VimEnter", "CursorHold" }, {
 	once = true,
 	callback = function()
-		if M.neovim_config_load_lazy_load_observer then
-			dispatcher:remove_observer(M.neovim_config_load_lazy_load_observer)
-			M.neovim_config_load_lazy_load_observer = nil
+		if M.neovim_config_load_event_registry_observer then
+			dispatcher:remove_observer(M.neovim_config_load_event_registry_observer)
+			M.neovim_config_load_event_registry_observer = nil
 		end
 	end,
 })
@@ -53,8 +56,8 @@ M.setup = function(config)
 	end
 
 	for _, observer in ipairs(initial_observers) do
-		if M.neovim_config_load_lazy_load_observer then
-			M.neovim_config_load_lazy_load_observer:load(observer)
+		if M.neovim_config_load_event_registry_observer then
+			M.neovim_config_load_event_registry_observer:transfer(observer)
 		end
 		dispatcher:add_observer(observer)
 	end
@@ -153,14 +156,14 @@ end
 ---@return function(observer:Observer):nil on_load The callback that will replay recorded events and add the observer.
 M.add_lazy_load_observer = function(opts)
 	opts = opts or {}
-	local lazy_load_observer = require("keymaster.lazy-load-observer").LazyLoadObserver()
-	if not opts.disable_config_time_events and M.neovim_config_load_lazy_load_observer then
-		M.neovim_config_load_lazy_load_observer:load(lazy_load_observer)
+	local event_registry_observer = require("keymaster.event-registry-observer").EventRegistryObserver:new()
+	if not opts.disable_config_time_events and M.neovim_config_load_event_registry_observer then
+		M.neovim_config_load_event_registry_observer:transfer(event_registry_observer)
 	end
-	M.add_observer(lazy_load_observer)
+	M.add_observer(event_registry_observer)
 	return function(observer)
-		lazy_load_observer:load(observer)
-		M.remove_observer(lazy_load_observer)
+		event_registry_observer:transfer(observer)
+		M.remove_observer(event_registry_observer)
 		M.add_observer(observer)
 	end
 end

@@ -1,11 +1,11 @@
-describe("keymaster.lazy-load-observer", function()
-	local lazy_load_observer_m = require("keymaster.lazy-load-observer")
-	it("loads all events into the provided observer", function()
-		local lazy_observer = lazy_load_observer_m.LazyLoadObserver()
+describe("keymaster.event-registry-observer", function()
+	local event_registry_observer_m = require("keymaster.event-registry-observer")
+	it("transfers all events into the provided observer", function()
+		local event_registry_observer = event_registry_observer_m.EventRegistryObserver:new()
 
-		lazy_observer:notify_keymap_set({ mode = "n", lhs = "a", rhs = "b", opts = {} })
-		lazy_observer:notify_key_group_set({ mode = "n", lhs = "<leader>g", opts = { name = "+Git" } })
-		lazy_observer:notify_keymap_deleted({ mode = "n", lhs = "a", rhs = "b", opts = {} })
+		event_registry_observer:notify_keymap_set({ mode = "n", lhs = "a", rhs = "b", opts = {} })
+		event_registry_observer:notify_key_group_set({ mode = "n", lhs = "<leader>g", opts = { name = "+Git" } })
+		event_registry_observer:notify_keymap_deleted({ mode = "n", lhs = "a", rhs = "b", opts = {} })
 
 		local notified_events = {}
 
@@ -22,7 +22,7 @@ describe("keymaster.lazy-load-observer", function()
 			end,
 		}
 
-		lazy_observer:load(observer)
+		event_registry_observer:transfer(observer)
 
 		assert.are.same({
 			{ event = "keymap_set", keymap = { mode = "n", lhs = "a", rhs = "b", opts = {} } },
