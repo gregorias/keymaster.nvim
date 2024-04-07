@@ -4,10 +4,10 @@ local M = {}
 local dispatcher = require("keymaster.keymap-dispatcher").KeymapDispatcher:new()
 
 --- An event registry observer that stores keymap events till VimEnter.
----
---- This observer facilitates users using Keymaster at an arbitrary point in
---- their config lifetime and still capturing all relevant events to be
---- replayed to final observers.
+--
+-- This observer facilitates users using Keymaster at an arbitrary point in their config lifetime and still capturing
+-- all relevant events to be replayed to final observers.
+--
 ---@type EventRegistryObserver
 M.neovim_config_load_event_registry_observer = require("keymaster.event-registry-observer").EventRegistryObserver:new()
 dispatcher:add_observer(M.neovim_config_load_event_registry_observer)
@@ -22,57 +22,6 @@ vim.api.nvim_create_autocmd({ "VimEnter", "CursorHold" }, {
 		end
 	end,
 })
-
-local initial_observers = {}
-
----@class (exact) KeymasterConfig
----@field disable_legendary boolean?
----@field disable_which_key boolean?
-
---- Set up Keymaster.
----
---- This is an optional function for those folks who don’t want to deal with
---- configuring anything. It’s plug-and-play.
----
---- TODO: Test this function and config-time setup in general.
----
----@param config KeymasterConfig Keymaster configuration.
-M.setup = function(config)
-	config = config or {}
-
-	local vim_keymap_observer = require("keymaster.vim-keymap").VimKeymap()
-	if config.disable_which_key then
-		table.insert(initial_observers, vim_keymap_observer)
-	else
-		-- TODO: This code is ugly. Refactor it.
-		-- TODO: Legendary has its own specialized function for checking if it’s installed.
-		local which_key_status, which_key = pcall(require, "which-key")
-		if which_key_status then
-			table.insert(initial_observers, require("keymaster.whichkey").WhichKeyObserver(which_key))
-		else
-			table.insert(initial_observers, vim_keymap_observer)
-		end
-	end
-
-	if not config.disable_legendary and require("keymaster.legendary").is_legendary_installed() then
-		table.insert(initial_observers, require("keymaster.legendary").LegendaryObserver())
-	end
-
-	for _, observer in ipairs(initial_observers) do
-		if M.neovim_config_load_event_registry_observer then
-			M.neovim_config_load_event_registry_observer:transfer(observer)
-		end
-		dispatcher:add_observer(observer)
-	end
-end
-
---- Shut down Keymaster.
-M.shutdown = function()
-	for _, observer in ipairs(initial_observers) do
-		dispatcher:remove_observer(observer)
-	end
-	initial_observers = {}
-end
 
 --- Set a keymap using Neovim-like keymap syntax.
 ---
@@ -130,24 +79,24 @@ M.delete_keymap = function(mode, lhs, opts)
 end
 
 --- Delete a keymap.
----
---- An alias for `delete_keymap`. Since this plugin is a replacement for
---- vim.keymap, just `delete` makes sense.
+--
+-- An alias for `delete_keymap`. Since this plugin is a replacement for vim.keymap, just `delete` makes sense.
 M.del = M.delete_keymap
 
 --- Add a keymap observer.
----
----@param observer Observer
+--
+-- @param observer Observer
 M.add_observer = function(observer)
 	dispatcher:add_observer(observer)
 end
 
 --- Add a lazy load keymap observer.
----
---- This function facilitates lazy loading of keymap observers. Call this
---- function during config initialization. Once you are ready to add the final
---- observer, call the callback with it.
----
+--
+-- This function facilitates lazy loading of keymap observers. Call this function during config initialization. Once you
+-- are ready to add the final observer, call the callback with it.
+--
+--  TODO: Rename this function to `add_event_registry_observer`.
+--
 ---@param opts { disable_config_time_events: boolean? }?
 ---@return function(observer:Observer):nil on_load The callback that will replay recorded events and add the observer.
 M.add_lazy_load_observer = function(opts)
