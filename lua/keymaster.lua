@@ -95,8 +95,6 @@ end
 -- This function facilitates lazy loading of keymap observers. Call this function during config initialization. Once you
 -- are ready to add the final observer, call the callback with it.
 --
---  TODO: Rename this function to `add_event_registry_observer`.
---
 ---@param opts { disable_config_time_events: boolean? }?
 ---@return function(observer:Observer):nil on_load The callback that will replay recorded events and add the observer.
 M.add_lazy_load_observer = function(opts)
