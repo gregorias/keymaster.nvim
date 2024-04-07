@@ -11,16 +11,32 @@ local M = {}
 M.to_wk_keymap = function(keymap)
 	local opts = keymap.opts or {}
 
+	-- noremap is true by default for vim.keymap.
+	local noremap = opts.noremap
+	if opts.noremap == false then
+		noremap = false
+	else
+		noremap = true
+	end
+
+	-- silent is false by default for vim.keymap.
+	local silent = opts.silent
+	if opts.silent == true then
+		silent = true
+	else
+		silent = false
+	end
+
 	return {
 		{ [keymap.lhs] = {
 			keymap.rhs,
-			opts.desc or "",
+			opts.desc,
 		} },
 		{
 			mode = keymap.mode,
 			buffer = opts.buffer or nil,
-			silent = opts.silent or true,
-			noremap = opts.noremap or true,
+			silent = silent,
+			noremap = noremap,
 			nowait = opts.nowait or false,
 			expr = opts.expr or false,
 		},

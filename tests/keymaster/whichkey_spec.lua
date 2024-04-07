@@ -3,7 +3,7 @@ local table_utils = require("keymaster.table-utils")
 describe("keymaster.whichkey", function()
 	local keymaster_whichkey = require("keymaster.whichkey")
 
-	describe("to_wk_keymaps", function()
+	describe("to_wk_keymap", function()
 		local to_wk_keymaps = keymaster_whichkey.to_wk_keymap
 		it("transforms Keymaster keymaps fully", function()
 			---@type KeymasterKeymap
@@ -40,6 +40,37 @@ describe("keymaster.whichkey", function()
 			}, wk_keymap)
 		end)
 
+		it("maintains falsey opts", function()
+			---@type KeymasterKeymap
+			local km_keymap = {
+				mode = { "n", "x" },
+				lhs = "<leader>fgx",
+				rhs = ":fgx action",
+				opts = {
+					silent = false,
+					noremap = false,
+					nowait = false,
+					expr = false,
+				},
+			}
+
+			---@type WhichKeyKeymap
+			local wk_keymap = to_wk_keymaps(km_keymap)
+
+			assert.are.same({
+				{
+					["<leader>fgx"] = { ":fgx action" },
+				},
+				{
+					mode = { "n", "x" },
+					silent = false,
+					noremap = false,
+					nowait = false,
+					expr = false,
+				},
+			}, wk_keymap)
+		end)
+
 		it("transforms Keymaster keymaps with honoring WK defaults", function()
 			---@type KeymasterKeymap
 			local km_keymap = {
@@ -62,7 +93,7 @@ describe("keymaster.whichkey", function()
 				{
 					mode = { "n", "x" },
 					buffer = nil,
-					silent = true,
+					silent = false,
 					noremap = true,
 					nowait = false,
 					expr = false,
