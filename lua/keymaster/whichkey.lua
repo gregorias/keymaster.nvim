@@ -148,26 +148,21 @@ M.WhichKeyObserver = function(wk)
 
 		---@param key_group KeymasterKeyGroup
 		notify_key_group_set = function(_, key_group)
-			wk.register({
-				[key_group.lhs] = {
-					name = key_group.opts.name,
-				},
-			}, {
+			wk.add({
+				[1] = key_group.lhs,
+				group = key_group.opts.name,
 				mode = key_group.mode,
 				buffer = key_group.opts.buffer,
 			})
-			-- Fixes a bug, where:
-			--
-			-- - The WhichKey window doesn’t show up in the visual mode ("v" or "x")
-			--   The open bug in question: https://github.com/folke/which-key.nvim/issues/458.
-			-- - The WhichKey window doesn’t show up in when there’s a conflicting prefix, e.g., `gcr` is used for Coerce, but
-			--   `gc` is used for commenting.
-			vim.keymap.set(
-				key_group.mode,
-				key_group.lhs,
-				"<cmd>WhichKey " .. key_group.lhs .. " " .. key_group.mode .. "<cr>",
-				{ buffer = key_group.opts.buffer }
-			)
+			-- Fixes a bug, where the WhichKey window doesn’t show up in when there’s a conflicting prefix, e.g., `gcr` is
+			-- used for Coerce, but `gc` is used for commenting.
+			vim.keymap.set(key_group.mode, key_group.lhs, function()
+				local wk_mode = key_group.mode
+				if key_group.mode == "v" then
+					wk_mode = "x"
+				end
+				require("which-key").show({ keys = key_group.lhs, mode = wk_mode })
+			end, { buffer = key_group.opts.buffer })
 		end,
 	}
 end
