@@ -139,8 +139,19 @@ end
 M.WhichKeyObserver = function(wk)
 	return {
 		notify_keymap_set = function(_, keymap)
-			local mappings, opts = unpack(M.to_wk_keymap(keymap))
-			wk.register(mappings, opts)
+			local _, opts = unpack(M.to_wk_keymap(keymap))
+			local desc = (keymap.opts or {}).desc
+			wk.add({
+				[1] = keymap.lhs,
+				[2] = keymap.rhs,
+				desc = desc,
+				mode = opts.mode,
+				buffer = opts.buffer,
+				silent = opts.silent,
+				noremap = opts.noremap,
+				nowait = opts.nowait,
+				expr = opts.expr,
+			})
 		end,
 		notify_keymap_deleted = function(_, _)
 			return nil
