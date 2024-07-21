@@ -1,4 +1,5 @@
 local table_utils = require("keymaster.table-utils")
+require("tests.assert_extra")
 
 describe("keymaster.whichkey", function()
 	local keymaster_whichkey = require("keymaster.whichkey")
