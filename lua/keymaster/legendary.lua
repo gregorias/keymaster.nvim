@@ -14,12 +14,12 @@ end
 --- Create a Legendary observer.
 ---
 ---@return Observer
-M.LegendaryObserver = function(do_binding, use_groups)
-	local legendary_wk = require("legendary.util.which_key")
+M.LegendaryObserver = function()
 	return {
 		notify_keymap_set = function(_, keymap)
-			local mappings, opts = unpack(require("keymaster.whichkey").to_wk_keymap(keymap))
-			legendary_wk.bind_whichkey(mappings, opts, --[[do_binding]] do_binding, --[[use_groups]] use_groups)
+			local desc = keymap.opts and keymap.opts.desc
+			local mode = keymap.opts and keymap.opts.mode
+			require("legendary").keymap({ [1] = keymap.lhs, description = desc, mode = mode })
 		end,
 	}
 end
