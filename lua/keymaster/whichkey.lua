@@ -43,9 +43,73 @@ M.to_wk_keymap = function(keymap)
 	}
 end
 
+--- Transforms a Keymaster keymap into a WhichKey v3 keymap.
+---
+---@param keymap KeymasterKeymap
+---@return WhichKeyV3Keymap
+M.to_wk3_keymap = function(keymap)
+	local opts = keymap.opts or {}
+
+	-- noremap is true by default for vim.keymap.
+	local noremap = opts.noremap
+	if opts.noremap == false then
+		noremap = false
+	else
+		noremap = true
+	end
+
+	-- silent is false by default for vim.keymap.
+	local silent = opts.silent
+	if opts.silent == true then
+		silent = true
+	else
+		silent = false
+	end
+
+	return {
+		[1] = keymap.lhs,
+		[2] = keymap.rhs,
+		desc = opts.desc,
+		mode = keymap.mode,
+		buffer = opts.buffer or nil,
+		silent = silent,
+		noremap = noremap,
+		nowait = opts.nowait or false,
+		expr = opts.expr or false,
+	}
+end
+
 ---@alias WhichKeyKeymapping table
 ---@alias WhichKeyKeymappings { [string]: string | WhichKeyKeymappings | WhichKeyKeymapping }
 ---@alias WhichKeyKeymap { [1]: WhichKeyKeymapping, [2]: WhichKeyOpts }
+
+--- A non-group keymap.
+---
+--- The fields comes from WhichKey's schema:
+--- (https://github.com/folke/which-key.nvim/blob/c4689ab39c1f51cac447893b05bb0266a7af1ed7/doc/which-key.nvim.txt#L284-L296).
+---
+---@class WhichKeyV3Keymap
+---@field [1] string lhs
+---@field [2]? string|fun() rhs
+---@field desc string|fun():string description
+---@field mode? string|string[]
+---@field cond? boolean|fun():boolean
+---@field hidden? boolean
+---@field icon? string|any|fun():(any|string)
+---@field proxy? string
+---@field expand? fun():any
+---@field buffer? number|boolean
+---@field remap? boolean
+---@field noremap? boolean
+---@field silent? boolean
+---@field expr? boolean
+---@field nowait? boolean
+
+--- A group keymap.
+---
+---@class WhichKeyV3Keygroup
+---@field [1] string lhs
+---@field group string|fun():string
 
 --- Schema taken from https://github.com/folke/which-key.nvim?tab=readme-ov-file#-setup.
 ---@class WhichKeyOpts
@@ -138,20 +202,8 @@ end
 ---@return Observer
 M.WhichKeyObserver = function(wk)
 	return {
-		notify_keymap_set = function(_, keymap)
-			local _, opts = unpack(M.to_wk_keymap(keymap))
-			local desc = (keymap.opts or {}).desc
-			wk.add({
-				[1] = keymap.lhs,
-				[2] = keymap.rhs,
-				desc = desc,
-				mode = opts.mode,
-				buffer = opts.buffer,
-				silent = opts.silent,
-				noremap = opts.noremap,
-				nowait = opts.nowait,
-				expr = opts.expr,
-			})
+		notify_keymap_set = function(_, km_keymap)
+			wk.add(M.to_wk3_keymap(km_keymap))
 		end,
 		notify_keymap_deleted = function(_, _)
 			return nil

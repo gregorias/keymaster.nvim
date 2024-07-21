@@ -103,6 +103,98 @@ describe("keymaster.whichkey", function()
 		end)
 	end)
 
+	describe("to_wk3_keymap", function()
+		local to_wk_keymaps = keymaster_whichkey.to_wk3_keymap
+		it("transforms Keymaster keymaps fully", function()
+			---@type KeymasterKeymap
+			local km_keymap = {
+				mode = "x",
+				lhs = "<leader>fgx",
+				rhs = ":fgx action",
+				opts = {
+					desc = "fgx action",
+					buffer = 1,
+					silent = true,
+					noremap = true,
+					expr = false,
+					to_be_ignored = "foo",
+				},
+			}
+
+			---@type WhichKeyKeymap
+			local wk_keymap = to_wk_keymaps(km_keymap)
+
+			assert.are.same({
+				[1] = "<leader>fgx",
+				[2] = ":fgx action",
+				desc = "fgx action",
+				mode = "x",
+				buffer = 1,
+				silent = true,
+				noremap = true,
+				nowait = false,
+				expr = false,
+			}, wk_keymap)
+		end)
+
+		it("maintains falsey opts", function()
+			---@type KeymasterKeymap
+			local km_keymap = {
+				mode = { "n", "x" },
+				lhs = "<leader>fgx",
+				rhs = ":fgx action",
+				opts = {
+					silent = false,
+					noremap = false,
+					nowait = false,
+					expr = false,
+				},
+			}
+
+			---@type WhichKeyKeymap
+			local wk_keymap = to_wk_keymaps(km_keymap)
+
+			assert.are.same({
+				[1] = "<leader>fgx",
+				[2] = ":fgx action",
+				desc = nil,
+				mode = { "n", "x" },
+				buffer = nil,
+				silent = false,
+				noremap = false,
+				nowait = false,
+				expr = false,
+			}, wk_keymap)
+		end)
+
+		it("transforms Keymaster keymaps with honoring WK defaults", function()
+			---@type KeymasterKeymap
+			local km_keymap = {
+				mode = { "n", "x" },
+				lhs = "<leader>fgx",
+				rhs = ":fgx action",
+				opts = {
+					desc = "fgx action",
+				},
+			}
+
+			---@type WhichKeyKeymap
+			local wk_keymap = to_wk_keymaps(km_keymap)
+
+			assert.are.same({
+				[1] = "<leader>fgx",
+				[2] = ":fgx action",
+				desc = "fgx action",
+				mode = { "n", "x" },
+				buffer = nil,
+				silent = false,
+				noremap = true,
+				nowait = false,
+				expr = false,
+			}, wk_keymap)
+		end)
+	end)
+
 	describe("from_wk_keymappings", function()
 		local from_wk_keymappings = keymaster_whichkey.from_wk_keymappings
 
