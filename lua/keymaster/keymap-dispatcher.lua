@@ -7,6 +7,8 @@
 ---
 ---@class KeymapDispatcher
 ---@field observers Observer[]
+---@field add_observer fun(self: KeymapDispatcher, observer: Observer): nil
+---@field remove_observer fun(self: KeymapDispatcher, observer: Observer): nil
 ---@field set_keymap fun(self: KeymapDispatcher, keymap: KeymasterKeymap): nil
 ---@field delete_keymap fun(self: KeymapDispatcher, keymap: KeymasterKeymap): nil
 ---@field set_key_group fun(self: KeymapDispatcher, key_group: KeymasterKeyGroup): nil
