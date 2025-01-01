@@ -1,5 +1,21 @@
 # 🔑 Keymaster.nvim
 
+> [!WARNING]
+> This plugin is abandoned.
+>
+> Turns out it wasn’t a good idea. The benefit of having a single interface is
+> dwarfed by its drawbacks:
+>
+> - The interface is something that needs to be learned, and it’s not that
+>   easy with lazy observer shenanigans.
+> - The interface is something that needs to be maintained.
+> - The interface is something that needs to adapt to downstream changes.
+>   Which Key completely revamped its interface while this plugin existed.
+> - Turns out, often I just want to different settings in Legendary and Which
+>   Key.
+>
+> The cost of this plugin was bigger than just using WK and Legendary directly.
+
 _The keymapping solution for the modular age._
 
 Keymaster is a Neovim plugin that provides an extendable keymap _dispatcher_. The
